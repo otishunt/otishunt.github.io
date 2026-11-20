@@ -427,6 +427,219 @@ figcaption {
   outline: none;
 }
 
+/* ── Inside a shop ──────────────────────────────────────────── */
+.page {
+  position: relative;
+}
+
+.purse {
+  position: absolute;
+  top: 32px;
+  right: 16px;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: "Lower Pixel", "Latin Modern", serif;
+}
+
+.coin {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #ffc21a;
+  border: 1.5px solid #000;
+  box-shadow: inset -2px -2px 0 #e0a000;
+}
+
+.shop-ui {
+  margin-bottom: 44px;
+  font-family: "Lower Pixel", "Latin Modern", serif;
+}
+
+.shop-scene {
+  display: grid;
+  grid-template-columns: minmax(0, 360px) minmax(0, 1fr);
+  gap: 20px;
+  align-items: center;
+}
+
+.shop-art {
+  display: block;
+  width: 100%;
+  height: auto;
+  border: 1.5px solid #000;
+}
+
+.speech {
+  position: relative;
+  padding: 16px 18px;
+  border: 1.5px solid #000;
+  background: #fff;
+  box-shadow: 4px 4px 0 #000;
+}
+
+.speech::before {
+  /* the bubble's tail, pointing at the shopkeeper */
+  content: "";
+  position: absolute;
+  left: -11px;
+  top: 34px;
+  width: 18px;
+  height: 18px;
+  background: #fff;
+  border-left: 1.5px solid #000;
+  border-bottom: 1.5px solid #000;
+  transform: rotate(45deg);
+}
+
+.speech .speaker {
+  margin: 0 0 6px;
+  font-size: 15px;
+  text-align: left;
+  color: #8f2a1c;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+.speech .line {
+  min-height: 4.35em; /* room for three lines, so the bubble doesn't grow as text types in */
+  margin: 0;
+  font-size: 17px;
+  line-height: 1.45;
+  text-align: left;
+}
+
+.shop-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 14px;
+  margin-top: 18px;
+}
+
+.shop-actions[hidden] {
+  display: none;
+}
+
+.buy-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.buy[hidden] {
+  display: none;
+}
+
+.buy {
+  min-height: 44px;
+  padding: 0 18px;
+  background: #ffc21a;
+  border: 1.5px solid #000;
+  box-shadow: 3px 3px 0 #000;
+  cursor: pointer;
+}
+
+.buy:hover {
+  background: #ffd45c;
+}
+
+.buy:active {
+  transform: translate(2px, 2px);
+  box-shadow: 1px 1px 0 #000;
+}
+
+.buy:focus-visible {
+  outline: 2px solid #000;
+  outline-offset: 4px;
+}
+
+.hint {
+  font-size: 14px;
+  opacity: 0.7;
+}
+
+/* Shop art: same line style as the map */
+.shop-art path,
+.shop-art rect,
+.shop-art circle,
+.shop-art ellipse {
+  stroke: #000;
+  stroke-width: 1.5;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+
+.shop-art .k-wall      { fill: #f3ead9; stroke: none; }
+.shop-art .k-shelf     { fill: #a8743d; }
+.shop-art .k-roll      { fill: #f3e2bd; }
+.shop-art .k-ribbon    { fill: #8f2a1c; }
+.shop-art .k-jar1      { fill: #d6eaf8; }
+.shop-art .k-jar2      { fill: #d9efcf; }
+.shop-art .k-jar3      { fill: #f0cdbd; }
+.shop-art .k-candle    { fill: #fff; }
+.shop-art .k-flame     { fill: #ffc21a; }
+.shop-art .k-counter   { fill: #c08a52; }
+.shop-art .k-countertop{ fill: #8a5a2b; }
+.shop-art .k-line      { fill: none; }
+.shop-art .k-eye       { fill: #000; stroke: none; }
+.shop-art .k-hair      { fill: #cfcfcf; }
+.shop-art .k-glass     { fill: rgba(255, 255, 255, 0.35); }
+.shop-art .k-goggle    { fill: #9fd3e6; }
+.shop-art .k-apron     { fill: #8a5a2b; }
+.shop-art .k-beard     { fill: #5e3a1a; }
+.shop-art .k-gold      { fill: #ffc21a; }
+.shop-art .k-cap       { fill: #a63d32; }
+.shop-art .k-feather   { fill: #ffc21a; }
+.shop-art .k-post      { fill: #2f466c; }
+.shop-art .k-book1     { fill: #6f8f6a; }
+.shop-art .k-book2     { fill: #8f2a1c; }
+.shop-art .k-book3     { fill: #3f5c8a; }
+.shop-art .k-gear      { fill: #b9bec7; }
+.shop-art .k-metal     { fill: #b9bec7; }
+.shop-art .k-shield    { fill: #3f5c8a; }
+.shop-art .k-letter    { fill: #fff; }
+.shop-art .k-quill     { fill: #fff; }
+
+/* A scroll you haven't bought yet stays on the counter */
+.scroll.sealed {
+  display: none;
+}
+
+/* Several bought scrolls stack with room for their rods */
+.scroll:not(.sealed) ~ .scroll:not(.sealed) {
+  margin-top: 64px;
+}
+
+.scroll.unrolling {
+  animation: unroll 0.8s ease-out both;
+}
+
+@keyframes unroll {
+  from { clip-path: inset(0 -30px 100% -30px); }
+  to   { clip-path: inset(-30px -30px -30px -30px); }
+}
+
+@media (max-width: 640px) {
+  .shop-scene {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .speech::before {
+    left: 40px;
+    top: -11px;
+    transform: rotate(135deg);
+  }
+}
+
 /* The parchment, with a rolled rod at the top and bottom */
 .scroll {
   position: relative;
@@ -509,7 +722,7 @@ figcaption {
 }
 
 /* Ink appearing as if a wizard is writing it, one line of the scroll at a time */
-.page.inking .ink {
+.inking .ink {
   animation: ink 1s ease-out both;
 }
 
@@ -571,7 +784,8 @@ figcaption {
   .walker.idle .walker-body,
   .pet-pop,
   .resident,
-  .page.inking .ink {
+  .scroll.unrolling,
+  .inking .ink {
     animation: none;
   }
   .walker-body,
