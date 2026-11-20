@@ -9,19 +9,12 @@
 </head>
 <body>
   <main class="world" id="world">
-    <aside class="key" aria-label="Controls">
-      <p class="key-title">Key</p>
-      <div class="key-row">
-        <div class="arrows" aria-hidden="true">
-          <kbd class="up">↑</kbd>
-          <kbd class="left">←</kbd><kbd class="down">↓</kbd><kbd class="right">→</kbd>
-        </div>
-        <span>Walk</span>
+    <aside class="key" aria-label="Use the arrow keys to walk and the space bar to go inside">
+      <div class="arrows" aria-hidden="true">
+        <kbd class="up">↑</kbd>
+        <kbd class="left">←</kbd><kbd class="down">↓</kbd><kbd class="right">→</kbd>
       </div>
-      <div class="key-row">
-        <kbd class="wide">Enter</kbd>
-        <span>Go inside</span>
-      </div>
+      <kbd class="space" aria-hidden="true"></kbd>
     </aside>
 
     <header class="title">
@@ -147,7 +140,7 @@
 
       <figcaption>
         <span class="fig">Figure 1:</span>
-        <span id="status">Use ← → to walk. Press Enter to go inside.</span>
+        <span id="status">Use the arrow keys to walk. Press Space to go inside.</span>
       </figcaption>
 
       <div class="controls" aria-label="Map controls">

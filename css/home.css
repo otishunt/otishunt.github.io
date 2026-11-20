@@ -42,28 +42,11 @@ a {
   position: absolute;
   top: 16px;
   left: 16px;
-  padding: 10px 14px 12px;
-  border: 1.5px solid #000;
-  background: #fff;
-  font-size: 15px;
-  line-height: 1.2;
+  display: flex;
+  align-items: flex-end;
+  gap: 14px;
   z-index: 1;
   transition: opacity 0.4s ease;
-}
-
-.key-title {
-  margin: 0 0 8px;
-  font-weight: 700;
-}
-
-.key-row {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.key-row + .key-row {
-  margin-top: 10px;
 }
 
 .arrows {
@@ -92,8 +75,8 @@ kbd {
   line-height: 1;
 }
 
-kbd.wide {
-  width: 81px; /* same width as the arrow cluster */
+kbd.space {
+  width: 120px;
 }
 
 .world.leaving .key {
@@ -104,7 +87,6 @@ kbd.wide {
 @media (max-width: 760px) {
   .key {
     position: static;
-    display: inline-block;
     margin-bottom: 16px;
   }
 }
