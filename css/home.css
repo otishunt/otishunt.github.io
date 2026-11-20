@@ -31,6 +31,7 @@ a {
 
 /* ── Map screen ─────────────────────────────────────────────── */
 .world {
+  font-family: "Lower Pixel", "Latin Modern", "Times New Roman", serif;
   max-width: 1100px;
   margin: 0 auto;
   padding: 40px 16px 32px;
@@ -110,11 +111,6 @@ kbd.space {
   line-height: 1.1;
 }
 
-.subtitle {
-  margin: 6px 0 0;
-  font-size: 1.15rem;
-}
-
 .map-figure {
   margin: 0;
 }
@@ -156,22 +152,43 @@ kbd.space {
 }
 
 .map text {
-  font-family: "Latin Modern", "Times New Roman", serif;
+  font-family: "Lower Pixel", "Latin Modern", "Times New Roman", serif;
 }
 
 .scenery {
   fill: none;
   stroke: #000;
+  stroke-opacity: 0.55; /* faded outlines; fills below stay full colour */
   stroke-width: 1.5;
   stroke-linecap: round;
   stroke-linejoin: round;
-  opacity: 0.55;
 }
+
+.scenery .trees path { fill: #d9efcf; } /* pale green */
+.scenery .clouds     { fill: #ececec; } /* light grey */
+.scenery .sun        { stroke: #ffc21a; stroke-opacity: 1; stroke-width: 2.5; } /* yellow rays */
+.scenery .sun circle { fill: #ffc21a; } /* warm yellow */
+
+/* Medieval town */
+.scenery .stone   { fill: #eeebe4; } /* pale stone */
+.scenery .plaster { fill: #faf6ee; } /* whitewashed walls */
+.scenery .roof    { fill: #f0cdbd; } /* pale clay tiles */
+.scenery .slate   { fill: #dde2ea; } /* pale slate */
+.scenery .window  { fill: #fff; }
+.scenery .door    { fill: #e9e2d6; }
+.scenery .flag    { fill: #ff8c1a; stroke: #000; } /* same orange as the sun */
+.scenery .trees circle { fill: #d9efcf; }
+.scenery .street  { fill: #f2efe9; stroke: none; } /* cobbled street */
+.scenery .cobbles { stroke-opacity: 0.25; }
+
+/* Far layer of the city sits back in the haze */
+.scenery .far { opacity: 0.5; }
 
 .trail path {
   fill: none;
   stroke: #000;
-  stroke-width: 4;
+  stroke-opacity: 0.35;
+  stroke-width: 3;
   stroke-linecap: round;
   stroke-dasharray: 0 14;
 }
@@ -180,13 +197,18 @@ kbd.space {
   cursor: pointer;
 }
 
-.checkpoint .outline,
-.checkpoint .door,
-.checkpoint .pad {
-  fill: #fff;
-  stroke: #000;
-  stroke-width: 2;
-  stroke-linejoin: round;
+/* Storefronts use the city's colours; the one you're at (or hovering) gets a firmer outline */
+.checkpoint .shop {
+  transition: stroke-opacity 0.2s ease;
+}
+
+.checkpoint .shop .door {
+  fill: #faf6ee; /* near-white, so zooming through it fades into the page */
+}
+
+.checkpoint:hover .shop,
+.checkpoint.here .shop {
+  stroke-opacity: 1;
 }
 
 .checkpoint .label {

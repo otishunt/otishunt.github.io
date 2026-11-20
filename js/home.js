@@ -122,7 +122,7 @@
     if (current === target) return;
     moving = true;
     setIdle(false);
-    statusEl.textContent = 'Walking…';
+    statusEl.textContent = 'Walking...';
     updateStatus();
 
     (function loop() {

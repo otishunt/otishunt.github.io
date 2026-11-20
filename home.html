@@ -19,109 +19,441 @@
 
     <header class="title">
       <h1>Otis Hunt</h1>
-      <p class="subtitle">Portfolio</p>
     </header>
 
     <figure class="map-figure">
       <div class="map-scroll" id="mapScroll">
       <div class="map-wrap" id="mapWrap">
-        <svg class="map" id="map" viewBox="0 0 1000 600" role="img"
+        <svg class="map" id="map" viewBox="0 0 1000 530" role="img"
              aria-label="Map of the portfolio. Walk the figure to a checkpoint and go inside.">
 
-          <!-- ── Scenery ─────────────────────────────────────────── -->
+          <!-- ── Scenery: a layered medieval city ────────────────── -->
           <g class="scenery" aria-hidden="true">
-            <!-- clouds -->
-            <path d="M150 100 a18 18 0 0 1 30 -16 a24 24 0 0 1 44 6 a16 16 0 0 1 6 30 h-76 a14 14 0 0 1 -4 -20 z" />
-            <path d="M600 80 a14 14 0 0 1 24 -12 a20 20 0 0 1 36 5 a13 13 0 0 1 4 24 h-60 a11 11 0 0 1 -4 -17 z" />
+            <!-- sky -->
+            <g class="clouds">
+            <path d="M150 90 a18 18 0 0 1 30 -16 a24 24 0 0 1 44 6 a16 16 0 0 1 6 30 h-76 a14 14 0 0 1 -4 -20 z" />
+            <path d="M560 70 a14 14 0 0 1 24 -12 a20 20 0 0 1 36 5 a13 13 0 0 1 4 24 h-60 a11 11 0 0 1 -4 -17 z" />
+            <path d="M20 40 a12 12 0 0 1 20 -10 a16 16 0 0 1 30 4 a11 11 0 0 1 4 20 h-50 a9 9 0 0 1 -4 -14 z" />
+            <path d="M610 150 a12 12 0 0 1 20 -10 a16 16 0 0 1 30 4 a11 11 0 0 1 4 20 h-50 a9 9 0 0 1 -4 -14 z" />
+            </g>
+            <g class="sun">
+            <circle cx="880" cy="58" r="16" />
+            <path d="M880 30 v-10 M880 86 v10 M852 58 h-10 M908 58 h10
+                     M860 38 l-7 -7 M900 38 l7 -7 M860 78 l-7 7 M900 78 l7 7" />
+            </g>
+            <path d="M465 45 q5 -5 10 0 q5 -5 10 0 M490 62 q4 -4 8 0 q4 -4 8 0 M690 120 q4 -4 8 0 q4 -4 8 0" />
 
-            <!-- sun -->
-            <circle cx="790" cy="62" r="16" />
-            <path d="M790 34 v-10 M790 90 v10 M762 62 h-10 M818 62 h10
-                     M770 42 l-7 -7 M810 42 l7 -7 M770 82 l-7 7 M810 82 l7 7" />
+            <!-- far layer: castle, cathedral, towers and rooftops (faded) -->
+            <g class="far">
+            <rect class="stone" x="110" y="170" width="30" height="230" />
+            <path class="slate" d="M105 170 L125 126 L145 170 Z" />
+            <path d="M125 184 v10" />
+            <rect class="stone" x="275" y="150" width="60" height="250" />
+            <path class="stone" d="M275 150 h12 v-7 h12 v7 h12 v-7 h12 v7 h12 v-7 v7 V154 H275 Z" />
+            <path d="M305 143 v-22" /><path class="flag" d="M305 121 l16 5 l-16 5 Z" />
+            <path d="M305 164 v10" />
+            <path class="stone" d="M240 205 h10 v-7 h10 v7 h10 v-7 h10 v7 h10 v-7 h10 v7 h10 v-7 h10 v7 h10 v-7 h10 v7 h10 v-7 h10 v7 h10 v-7 v7 V400 H240 Z" />
+            <rect class="stone" x="225" y="180" width="25" height="220" />
+            <path class="roof" d="M220 180 L237.5 146 L255 180 Z" />
+            <path d="M237.5 194 v10" />
+            <rect class="stone" x="360" y="180" width="25" height="220" />
+            <path class="roof" d="M355 180 L372.5 146 L390 180 Z" />
+            <path d="M372.5 146 v-22" /><path class="flag" d="M372.5 124 l16 5 l-16 5 Z" />
+            <path d="M372.5 194 v10" />
+            <rect class="stone" x="520" y="190" width="32" height="210" />
+            <path class="stone" d="M520 190 h6.4 v-7 h6.4 v7 h6.4 v-7 h6.4 v7 h6.4 v-7 v7 V194 H520 Z" />
+            <path d="M536 204 v10" />
+            <rect class="plaster" x="690" y="230" width="80" height="170" />
+            <path class="roof" d="M686 230 L730 200 L774 230 Z" />
+            <circle class="window" cx="730" cy="252" r="10" />
+            <path d="M730 242 v20 M720 252 h20" />
+            <rect class="plaster" x="770" y="170" width="34" height="230" />
+            <path class="roof" d="M766 170 L787 92 L808 170 Z" />
+            <path d="M787 92 v-12 M782 85 h10" />
+            <path class="window" d="M781 206 v-12 a6 6 0 0 1 12 0 v12 Z" />
+            <rect class="stone" x="930" y="175" width="32" height="225" />
+            <path class="roof" d="M925 175 L946 135 L967 175 Z" />
+            <path d="M946 189 v10" />
+            <rect class="plaster" x="-10" y="270" width="46" height="130" />
+            <path class="roof" d="M-13 270 L13 240 L39 270 Z" />
+            <rect class="plaster" x="40" y="256" width="38" height="144" />
+            <path class="slate" d="M37 256 L59 228 L81 256 Z" />
+            <rect class="plaster" x="82" y="278" width="54" height="122" />
+            <path class="roof" d="M79 278 L109 244 L139 278 Z" />
+            <rect class="plaster" x="140" y="250" width="42" height="150" />
+            <path class="slate" d="M137 250 L161 220 L185 250 Z" />
+            <rect class="plaster" x="186" y="266" width="50" height="134" />
+            <path class="roof" d="M183 266 L211 234 L239 266 Z" />
+            <rect class="plaster" x="240" y="270" width="46" height="130" />
+            <path class="roof" d="M237 270 L263 240 L289 270 Z" />
+            <rect class="plaster" x="290" y="256" width="38" height="144" />
+            <path class="slate" d="M287 256 L309 228 L331 256 Z" />
+            <rect class="plaster" x="332" y="278" width="54" height="122" />
+            <path class="roof" d="M329 278 L359 244 L389 278 Z" />
+            <rect class="plaster" x="390" y="250" width="42" height="150" />
+            <path class="slate" d="M387 250 L411 220 L435 250 Z" />
+            <rect class="plaster" x="436" y="266" width="50" height="134" />
+            <path class="roof" d="M433 266 L461 234 L489 266 Z" />
+            <rect class="plaster" x="490" y="270" width="46" height="130" />
+            <path class="roof" d="M487 270 L513 240 L539 270 Z" />
+            <rect class="plaster" x="540" y="256" width="38" height="144" />
+            <path class="slate" d="M537 256 L559 228 L581 256 Z" />
+            <rect class="plaster" x="582" y="278" width="54" height="122" />
+            <path class="roof" d="M579 278 L609 244 L639 278 Z" />
+            <rect class="plaster" x="640" y="250" width="42" height="150" />
+            <path class="slate" d="M637 250 L661 220 L685 250 Z" />
+            <rect class="plaster" x="686" y="266" width="50" height="134" />
+            <path class="roof" d="M683 266 L711 234 L739 266 Z" />
+            <rect class="plaster" x="740" y="270" width="46" height="130" />
+            <path class="roof" d="M737 270 L763 240 L789 270 Z" />
+            <rect class="plaster" x="790" y="256" width="38" height="144" />
+            <path class="slate" d="M787 256 L809 228 L831 256 Z" />
+            <rect class="plaster" x="832" y="278" width="54" height="122" />
+            <path class="roof" d="M829 278 L859 244 L889 278 Z" />
+            <rect class="plaster" x="890" y="250" width="42" height="150" />
+            <path class="slate" d="M887 250 L911 220 L935 250 Z" />
+            <rect class="plaster" x="936" y="266" width="50" height="134" />
+            <path class="roof" d="M933 266 L961 234 L989 266 Z" />
+            <rect class="plaster" x="990" y="270" width="46" height="130" />
+            <path class="roof" d="M987 270 L1013 240 L1039 270 Z" />
+            </g>
 
-            <!-- lake -->
-            <ellipse cx="130" cy="230" rx="78" ry="32" />
-            <path d="M85 225 q8 -6 16 0 t16 0 M120 240 q8 -6 16 0 t16 0 M150 218 q8 -6 16 0 t16 0" />
+            <!-- near layer: tall townhouses lining the street -->
+            <rect class="plaster" x="-6" y="320" width="52" height="120" />
+            <path class="roof" d="M-9 320 L20 290 L49 320 Z" />
+            <path d="M-6 338 H46 M-6 360 H46 M-6 320 L20 338 L46 320" />
+            <rect class="window" x="5.6" y="346" width="8" height="10" />
+            <rect class="window" x="26.4" y="346" width="8" height="10" />
+            <rect class="window" x="5.6" y="372" width="8" height="10" />
+            <rect class="window" x="26.4" y="372" width="8" height="10" />
+            <rect class="window" x="5.6" y="398" width="8" height="10" />
+            <rect class="window" x="26.4" y="398" width="8" height="10" />
+            <path class="door" d="M14 440 v-14 a6 6 0 0 1 12 0 v14 Z" />
+            <path class="stone" d="M48 440 V328 H55.1429 V316 H62.2857 V304 H69.4286 V292 H76.5714 V304 H83.7143 V316 H90.8571 V328 H98 V440 Z" />
+            <path class="window" d="M68 318 v-6 a5 5 0 0 1 10 0 v6 Z" />
+            <rect class="window" x="59" y="340" width="8" height="10" />
+            <rect class="window" x="79" y="340" width="8" height="10" />
+            <rect class="window" x="59" y="366" width="8" height="10" />
+            <rect class="window" x="79" y="366" width="8" height="10" />
+            <rect class="window" x="59" y="392" width="8" height="10" />
+            <rect class="window" x="79" y="392" width="8" height="10" />
+            <path class="door" d="M67 440 v-14 a6 6 0 0 1 12 0 v14 Z" />
+            <rect class="plaster" x="100" y="290" width="44" height="150" />
+            <path class="slate" d="M97 290 L122 256 L147 290 Z" />
+            <rect class="window" x="109.2" y="302" width="8" height="10" />
+            <rect class="window" x="126.8" y="302" width="8" height="10" />
+            <rect class="window" x="109.2" y="328" width="8" height="10" />
+            <rect class="window" x="126.8" y="328" width="8" height="10" />
+            <rect class="window" x="109.2" y="354" width="8" height="10" />
+            <rect class="window" x="126.8" y="354" width="8" height="10" />
+            <rect class="window" x="109.2" y="380" width="8" height="10" />
+            <rect class="window" x="126.8" y="380" width="8" height="10" />
+            <rect class="window" x="109.2" y="406" width="8" height="10" />
+            <rect class="window" x="126.8" y="406" width="8" height="10" />
+            <path class="door" d="M116 440 v-14 a6 6 0 0 1 12 0 v14 Z" />
+            <rect class="stone" x="146" y="335" width="58" height="105" />
+            <path class="roof" d="M143 335 L175 307 L207 335 Z" />
+            <path d="M146 353 H204 M146 375 H204 M146 335 L175 353 L204 335" />
+            <rect class="window" x="159.4" y="361" width="8" height="10" />
+            <rect class="window" x="182.6" y="361" width="8" height="10" />
+            <rect class="window" x="159.4" y="387" width="8" height="10" />
+            <rect class="window" x="182.6" y="387" width="8" height="10" />
+            <path class="door" d="M169 440 v-14 a6 6 0 0 1 12 0 v14 Z" />
+            <path class="stone" d="M206 440 V310 H212.571 V298 H219.143 V286 H225.714 V274 H232.286 V286 H238.857 V298 H245.429 V310 H252 V440 Z" />
+            <path class="window" d="M224 300 v-6 a5 5 0 0 1 10 0 v6 Z" />
+            <rect class="window" x="215.8" y="322" width="8" height="10" />
+            <rect class="window" x="234.2" y="322" width="8" height="10" />
+            <rect class="window" x="215.8" y="348" width="8" height="10" />
+            <rect class="window" x="234.2" y="348" width="8" height="10" />
+            <rect class="window" x="215.8" y="374" width="8" height="10" />
+            <rect class="window" x="234.2" y="374" width="8" height="10" />
+            <rect class="window" x="215.8" y="400" width="8" height="10" />
+            <rect class="window" x="234.2" y="400" width="8" height="10" />
+            <path class="door" d="M223 440 v-14 a6 6 0 0 1 12 0 v14 Z" />
+            <rect class="plaster" x="254" y="302" width="48" height="138" />
+            <path class="slate" d="M251 302 L278 270 L305 302 Z" />
+            <path d="M254 320 H302 M254 342 H302 M254 302 L278 320 L302 302" />
+            <rect class="window" x="264.4" y="328" width="8" height="10" />
+            <rect class="window" x="283.6" y="328" width="8" height="10" />
+            <rect class="window" x="264.4" y="354" width="8" height="10" />
+            <rect class="window" x="283.6" y="354" width="8" height="10" />
+            <rect class="window" x="264.4" y="380" width="8" height="10" />
+            <rect class="window" x="283.6" y="380" width="8" height="10" />
+            <rect class="window" x="264.4" y="406" width="8" height="10" />
+            <rect class="window" x="283.6" y="406" width="8" height="10" />
+            <path class="door" d="M272 440 v-14 a6 6 0 0 1 12 0 v14 Z" />
+            <rect class="plaster" x="304" y="320" width="52" height="120" />
+            <path class="roof" d="M301 320 L330 290 L359 320 Z" />
+            <path d="M304 338 H356 M304 360 H356 M304 320 L330 338 L356 320" />
+            <rect class="window" x="315.6" y="346" width="8" height="10" />
+            <rect class="window" x="336.4" y="346" width="8" height="10" />
+            <rect class="window" x="315.6" y="372" width="8" height="10" />
+            <rect class="window" x="336.4" y="372" width="8" height="10" />
+            <rect class="window" x="315.6" y="398" width="8" height="10" />
+            <rect class="window" x="336.4" y="398" width="8" height="10" />
+            <path class="door" d="M324 440 v-14 a6 6 0 0 1 12 0 v14 Z" />
+            <path class="stone" d="M358 440 V328 H365.143 V316 H372.286 V304 H379.429 V292 H386.571 V304 H393.714 V316 H400.857 V328 H408 V440 Z" />
+            <path class="window" d="M378 318 v-6 a5 5 0 0 1 10 0 v6 Z" />
+            <rect class="window" x="369" y="340" width="8" height="10" />
+            <rect class="window" x="389" y="340" width="8" height="10" />
+            <rect class="window" x="369" y="366" width="8" height="10" />
+            <rect class="window" x="389" y="366" width="8" height="10" />
+            <rect class="window" x="369" y="392" width="8" height="10" />
+            <rect class="window" x="389" y="392" width="8" height="10" />
+            <path class="door" d="M377 440 v-14 a6 6 0 0 1 12 0 v14 Z" />
+            <rect class="plaster" x="410" y="290" width="44" height="150" />
+            <path class="slate" d="M407 290 L432 256 L457 290 Z" />
+            <rect class="window" x="419.2" y="302" width="8" height="10" />
+            <rect class="window" x="436.8" y="302" width="8" height="10" />
+            <rect class="window" x="419.2" y="328" width="8" height="10" />
+            <rect class="window" x="436.8" y="328" width="8" height="10" />
+            <rect class="window" x="419.2" y="354" width="8" height="10" />
+            <rect class="window" x="436.8" y="354" width="8" height="10" />
+            <rect class="window" x="419.2" y="380" width="8" height="10" />
+            <rect class="window" x="436.8" y="380" width="8" height="10" />
+            <rect class="window" x="419.2" y="406" width="8" height="10" />
+            <rect class="window" x="436.8" y="406" width="8" height="10" />
+            <path class="door" d="M426 440 v-14 a6 6 0 0 1 12 0 v14 Z" />
+            <rect class="stone" x="456" y="335" width="58" height="105" />
+            <path class="roof" d="M453 335 L485 307 L517 335 Z" />
+            <path d="M456 353 H514 M456 375 H514 M456 335 L485 353 L514 335" />
+            <rect class="window" x="469.4" y="361" width="8" height="10" />
+            <rect class="window" x="492.6" y="361" width="8" height="10" />
+            <rect class="window" x="469.4" y="387" width="8" height="10" />
+            <rect class="window" x="492.6" y="387" width="8" height="10" />
+            <path class="door" d="M479 440 v-14 a6 6 0 0 1 12 0 v14 Z" />
+            <path class="stone" d="M516 440 V310 H522.571 V298 H529.143 V286 H535.714 V274 H542.286 V286 H548.857 V298 H555.429 V310 H562 V440 Z" />
+            <path class="window" d="M534 300 v-6 a5 5 0 0 1 10 0 v6 Z" />
+            <rect class="window" x="525.8" y="322" width="8" height="10" />
+            <rect class="window" x="544.2" y="322" width="8" height="10" />
+            <rect class="window" x="525.8" y="348" width="8" height="10" />
+            <rect class="window" x="544.2" y="348" width="8" height="10" />
+            <rect class="window" x="525.8" y="374" width="8" height="10" />
+            <rect class="window" x="544.2" y="374" width="8" height="10" />
+            <rect class="window" x="525.8" y="400" width="8" height="10" />
+            <rect class="window" x="544.2" y="400" width="8" height="10" />
+            <path class="door" d="M533 440 v-14 a6 6 0 0 1 12 0 v14 Z" />
+            <rect class="plaster" x="564" y="302" width="48" height="138" />
+            <path class="slate" d="M561 302 L588 270 L615 302 Z" />
+            <path d="M564 320 H612 M564 342 H612 M564 302 L588 320 L612 302" />
+            <rect class="window" x="574.4" y="328" width="8" height="10" />
+            <rect class="window" x="593.6" y="328" width="8" height="10" />
+            <rect class="window" x="574.4" y="354" width="8" height="10" />
+            <rect class="window" x="593.6" y="354" width="8" height="10" />
+            <rect class="window" x="574.4" y="380" width="8" height="10" />
+            <rect class="window" x="593.6" y="380" width="8" height="10" />
+            <rect class="window" x="574.4" y="406" width="8" height="10" />
+            <rect class="window" x="593.6" y="406" width="8" height="10" />
+            <path class="door" d="M582 440 v-14 a6 6 0 0 1 12 0 v14 Z" />
+            <rect class="plaster" x="614" y="320" width="52" height="120" />
+            <path class="roof" d="M611 320 L640 290 L669 320 Z" />
+            <path d="M614 338 H666 M614 360 H666 M614 320 L640 338 L666 320" />
+            <rect class="window" x="625.6" y="346" width="8" height="10" />
+            <rect class="window" x="646.4" y="346" width="8" height="10" />
+            <rect class="window" x="625.6" y="372" width="8" height="10" />
+            <rect class="window" x="646.4" y="372" width="8" height="10" />
+            <rect class="window" x="625.6" y="398" width="8" height="10" />
+            <rect class="window" x="646.4" y="398" width="8" height="10" />
+            <path class="door" d="M634 440 v-14 a6 6 0 0 1 12 0 v14 Z" />
+            <path class="stone" d="M668 440 V328 H675.143 V316 H682.286 V304 H689.429 V292 H696.571 V304 H703.714 V316 H710.857 V328 H718 V440 Z" />
+            <path class="window" d="M688 318 v-6 a5 5 0 0 1 10 0 v6 Z" />
+            <rect class="window" x="679" y="340" width="8" height="10" />
+            <rect class="window" x="699" y="340" width="8" height="10" />
+            <rect class="window" x="679" y="366" width="8" height="10" />
+            <rect class="window" x="699" y="366" width="8" height="10" />
+            <rect class="window" x="679" y="392" width="8" height="10" />
+            <rect class="window" x="699" y="392" width="8" height="10" />
+            <path class="door" d="M687 440 v-14 a6 6 0 0 1 12 0 v14 Z" />
+            <rect class="plaster" x="720" y="290" width="44" height="150" />
+            <path class="slate" d="M717 290 L742 256 L767 290 Z" />
+            <rect class="window" x="729.2" y="302" width="8" height="10" />
+            <rect class="window" x="746.8" y="302" width="8" height="10" />
+            <rect class="window" x="729.2" y="328" width="8" height="10" />
+            <rect class="window" x="746.8" y="328" width="8" height="10" />
+            <rect class="window" x="729.2" y="354" width="8" height="10" />
+            <rect class="window" x="746.8" y="354" width="8" height="10" />
+            <rect class="window" x="729.2" y="380" width="8" height="10" />
+            <rect class="window" x="746.8" y="380" width="8" height="10" />
+            <rect class="window" x="729.2" y="406" width="8" height="10" />
+            <rect class="window" x="746.8" y="406" width="8" height="10" />
+            <path class="door" d="M736 440 v-14 a6 6 0 0 1 12 0 v14 Z" />
+            <rect class="stone" x="766" y="335" width="58" height="105" />
+            <path class="roof" d="M763 335 L795 307 L827 335 Z" />
+            <path d="M766 353 H824 M766 375 H824 M766 335 L795 353 L824 335" />
+            <rect class="window" x="779.4" y="361" width="8" height="10" />
+            <rect class="window" x="802.6" y="361" width="8" height="10" />
+            <rect class="window" x="779.4" y="387" width="8" height="10" />
+            <rect class="window" x="802.6" y="387" width="8" height="10" />
+            <path class="door" d="M789 440 v-14 a6 6 0 0 1 12 0 v14 Z" />
+            <path class="stone" d="M826 440 V310 H832.571 V298 H839.143 V286 H845.714 V274 H852.286 V286 H858.857 V298 H865.429 V310 H872 V440 Z" />
+            <path class="window" d="M844 300 v-6 a5 5 0 0 1 10 0 v6 Z" />
+            <rect class="window" x="835.8" y="322" width="8" height="10" />
+            <rect class="window" x="854.2" y="322" width="8" height="10" />
+            <rect class="window" x="835.8" y="348" width="8" height="10" />
+            <rect class="window" x="854.2" y="348" width="8" height="10" />
+            <rect class="window" x="835.8" y="374" width="8" height="10" />
+            <rect class="window" x="854.2" y="374" width="8" height="10" />
+            <rect class="window" x="835.8" y="400" width="8" height="10" />
+            <rect class="window" x="854.2" y="400" width="8" height="10" />
+            <path class="door" d="M843 440 v-14 a6 6 0 0 1 12 0 v14 Z" />
+            <rect class="plaster" x="874" y="302" width="48" height="138" />
+            <path class="slate" d="M871 302 L898 270 L925 302 Z" />
+            <path d="M874 320 H922 M874 342 H922 M874 302 L898 320 L922 302" />
+            <rect class="window" x="884.4" y="328" width="8" height="10" />
+            <rect class="window" x="903.6" y="328" width="8" height="10" />
+            <rect class="window" x="884.4" y="354" width="8" height="10" />
+            <rect class="window" x="903.6" y="354" width="8" height="10" />
+            <rect class="window" x="884.4" y="380" width="8" height="10" />
+            <rect class="window" x="903.6" y="380" width="8" height="10" />
+            <rect class="window" x="884.4" y="406" width="8" height="10" />
+            <rect class="window" x="903.6" y="406" width="8" height="10" />
+            <path class="door" d="M892 440 v-14 a6 6 0 0 1 12 0 v14 Z" />
+            <rect class="plaster" x="924" y="320" width="52" height="120" />
+            <path class="roof" d="M921 320 L950 290 L979 320 Z" />
+            <path d="M924 338 H976 M924 360 H976 M924 320 L950 338 L976 320" />
+            <rect class="window" x="935.6" y="346" width="8" height="10" />
+            <rect class="window" x="956.4" y="346" width="8" height="10" />
+            <rect class="window" x="935.6" y="372" width="8" height="10" />
+            <rect class="window" x="956.4" y="372" width="8" height="10" />
+            <rect class="window" x="935.6" y="398" width="8" height="10" />
+            <rect class="window" x="956.4" y="398" width="8" height="10" />
+            <path class="door" d="M944 440 v-14 a6 6 0 0 1 12 0 v14 Z" />
+            <path class="stone" d="M978 440 V328 H985.143 V316 H992.286 V304 H999.429 V292 H1006.57 V304 H1013.71 V316 H1020.86 V328 H1028 V440 Z" />
+            <path class="window" d="M998 318 v-6 a5 5 0 0 1 10 0 v6 Z" />
+            <rect class="window" x="989" y="340" width="8" height="10" />
+            <rect class="window" x="1009" y="340" width="8" height="10" />
+            <rect class="window" x="989" y="366" width="8" height="10" />
+            <rect class="window" x="1009" y="366" width="8" height="10" />
+            <rect class="window" x="989" y="392" width="8" height="10" />
+            <rect class="window" x="1009" y="392" width="8" height="10" />
+            <path class="door" d="M997 440 v-14 a6 6 0 0 1 12 0 v14 Z" />
 
-            <!-- hills -->
-            <path d="M540 580 Q 640 440 740 580" />
-            <path d="M690 580 Q 800 470 910 580" />
-            <path d="M860 580 Q 940 500 1000 560" />
+            <!-- trees between the shops -->
+            <g class="trees">
+            <g transform="translate(180 440)"><path d="M0 0 v-12" /><circle cx="0" cy="-24" r="12" /></g>
+            <g transform="translate(205 440)"><path d="M0 0 v-12 M-10 -12 L0 -36 L10 -12 Z" /></g>
+            <g transform="translate(380 440)"><path d="M0 0 v-14 M-12 -14 L0 -44 L12 -14 Z" /></g>
+            <g transform="translate(580 440)"><path d="M0 0 v-12" /><circle cx="0" cy="-24" r="12" /></g>
+            <g transform="translate(780 440)"><path d="M0 0 v-14 M-12 -14 L0 -44 L12 -14 Z" /></g>
+            <g transform="translate(800 440)"><path d="M0 0 v-12 M-10 -12 L0 -36 L10 -12 Z" /></g>
+            <g transform="translate(975 440)"><path d="M0 0 v-12" /><circle cx="0" cy="-24" r="12" /></g>
+            </g>
 
-            <!-- trees -->
-            <g transform="translate(205 330)"><path d="M0 0 v-14 M-12 -14 L0 -44 L12 -14 Z" /></g>
-            <g transform="translate(232 345)"><path d="M0 0 v-12 M-10 -12 L0 -36 L10 -12 Z" /></g>
-            <g transform="translate(395 500)"><path d="M0 0 v-14 M-12 -14 L0 -44 L12 -14 Z" /></g>
-            <g transform="translate(575 445)"><path d="M0 0 v-14 M-12 -14 L0 -44 L12 -14 Z" /></g>
-            <g transform="translate(600 460)"><path d="M0 0 v-12 M-10 -12 L0 -36 L10 -12 Z" /></g>
-            <g transform="translate(360 130)"><path d="M0 0 v-14 M-12 -14 L0 -44 L12 -14 Z" /></g>
-            <g transform="translate(830 430)"><path d="M0 0 v-14 M-12 -14 L0 -44 L12 -14 Z" /></g>
-            <g transform="translate(960 330)"><path d="M0 0 v-12 M-10 -12 L0 -36 L10 -12 Z" /></g>
-            <g transform="translate(60 390)"><path d="M0 0 v-12 M-10 -12 L0 -36 L10 -12 Z" /></g>
-
-            <!-- grass ticks -->
-            <path d="M260 520 l4 -8 l4 8 M470 300 l4 -8 l4 8 M650 250 l4 -8 l4 8
-                     M120 540 l4 -8 l4 8 M930 240 l4 -8 l4 8 M520 520 l4 -8 l4 8" />
+            <!-- the street -->
+            <rect class="street" x="0" y="440" width="1000" height="84" />
+            <path class="cobbles" d="M18 462 h12 M44 462 h12 M70 462 h12 M96 462 h12 M122 462 h12 M148 462 h12 M174 462 h12 M200 462 h12 M226 462 h12 M252 462 h12 M278 462 h12 M304 462 h12 M330 462 h12 M356 462 h12 M382 462 h12 M408 462 h12 M434 462 h12 M460 462 h12 M486 462 h12 M512 462 h12 M538 462 h12 M564 462 h12 M590 462 h12 M616 462 h12 M642 462 h12 M668 462 h12 M694 462 h12 M720 462 h12 M746 462 h12 M772 462 h12 M798 462 h12 M824 462 h12 M850 462 h12 M876 462 h12 M902 462 h12 M928 462 h12 M954 462 h12 M980 462 h12 M6 478 h12 M32 478 h12 M58 478 h12 M84 478 h12 M110 478 h12 M136 478 h12 M162 478 h12 M188 478 h12 M214 478 h12 M240 478 h12 M266 478 h12 M292 478 h12 M318 478 h12 M344 478 h12 M370 478 h12 M396 478 h12 M422 478 h12 M448 478 h12 M474 478 h12 M500 478 h12 M526 478 h12 M552 478 h12 M578 478 h12 M604 478 h12 M630 478 h12 M656 478 h12 M682 478 h12 M708 478 h12 M734 478 h12 M760 478 h12 M786 478 h12 M812 478 h12 M838 478 h12 M864 478 h12 M890 478 h12 M916 478 h12 M942 478 h12 M968 478 h12 M994 478 h12 M18 494 h12 M44 494 h12 M70 494 h12 M96 494 h12 M122 494 h12 M148 494 h12 M174 494 h12 M200 494 h12 M226 494 h12 M252 494 h12 M278 494 h12 M304 494 h12 M330 494 h12 M356 494 h12 M382 494 h12 M408 494 h12 M434 494 h12 M460 494 h12 M486 494 h12 M512 494 h12 M538 494 h12 M564 494 h12 M590 494 h12 M616 494 h12 M642 494 h12 M668 494 h12 M694 494 h12 M720 494 h12 M746 494 h12 M772 494 h12 M798 494 h12 M824 494 h12 M850 494 h12 M876 494 h12 M902 494 h12 M928 494 h12 M954 494 h12 M980 494 h12 M6 510 h12 M32 510 h12 M58 510 h12 M84 510 h12 M110 510 h12 M136 510 h12 M162 510 h12 M188 510 h12 M214 510 h12 M240 510 h12 M266 510 h12 M292 510 h12 M318 510 h12 M344 510 h12 M370 510 h12 M396 510 h12 M422 510 h12 M448 510 h12 M474 510 h12 M500 510 h12 M526 510 h12 M552 510 h12 M578 510 h12 M604 510 h12 M630 510 h12 M656 510 h12 M682 510 h12 M708 510 h12 M734 510 h12 M760 510 h12 M786 510 h12 M812 510 h12 M838 510 h12 M864 510 h12 M890 510 h12 M916 510 h12 M942 510 h12 M968 510 h12 M994 510 h12" />
+            <path d="M0 440 H1000 M0 524 H1000" />
           </g>
 
-          <!-- ── Path between checkpoints (one segment per hop) ──── -->
+          <!-- ── Path along the street (one segment per hop) ──────── -->
           <g class="trail" aria-hidden="true">
-            <path id="seg-0" d="M90 470 C 160 470, 220 400, 300 380" />
-            <path id="seg-1" d="M300 380 C 380 360, 380 210, 480 200" />
-            <path id="seg-2" d="M480 200 C 580 190, 600 340, 700 330" />
-            <path id="seg-3" d="M700 330 C 800 320, 820 170, 900 160" />
+            <path id="seg-0" d="M80 450 H280" />
+            <path id="seg-1" d="M280 450 H480" />
+            <path id="seg-2" d="M480 450 H680" />
+            <path id="seg-3" d="M680 450 H880" />
           </g>
 
-          <!-- ── Checkpoints (door base sits on the path point) ──── -->
-          <g class="checkpoint" data-node="0" transform="translate(90 470)">
+          <!-- ── Stops: storefronts along the street (door centred on the stop) ── -->
+          <g class="checkpoint" data-node="0" transform="translate(80 450)">
             <title>Start</title>
-            <ellipse class="pad" cx="0" cy="0" rx="16" ry="5" />
-            <path class="outline" d="M-34 4 v-88 M-34 -84 h54 l10 10 l-10 10 h-54" />
-            <text x="-6" y="-69" class="sign">START</text>
-            <text class="label" y="30">Start</text>
+            <g class="scenery shop">
+            <path class="stone" d="M-24 0 v-62 h4 v62 Z" />
+            <path class="plaster" d="M-70 -60 h48 l10 10 l-10 10 h-48 Z" />
+            </g>
+            <text x="-46" y="-45" class="sign">START</text>
+            <text class="label" y="36">Start</text>
           </g>
 
-          <g class="checkpoint" data-node="1" transform="translate(300 380)">
+          <g class="checkpoint" data-node="1" transform="translate(280 450)">
             <title>About</title>
-            <ellipse class="pad" cx="0" cy="0" rx="16" ry="5" />
-            <rect class="outline" x="-35" y="-55" width="70" height="55" />
-            <path class="outline" d="M-45 -55 L0 -92 L45 -55 Z" />
-            <rect class="outline" x="19" y="-44" width="10" height="10" />
-            <rect class="door" x="-10" y="-30" width="20" height="30" />
-            <text class="label" y="30">About</text>
+            <g class="scenery shop">
+            <rect class="plaster" x="-42" y="-66" width="84" height="66" />
+            <rect class="roof" x="-46" y="-72" width="92" height="6" />
+            <rect class="plaster" x="-20" y="-60" width="40" height="16" />
+            <path d="M0 -53 m-3 0 a3 3 0 1 0 6 0 a3 3 0 1 0 -6 0 M-6 -46 q6 -7 12 0" />
+            <path class="roof" d="M-46 -38 h13.1429 v10 a6.57143 6.57143 0 0 1 -13.1429 0 Z" />
+            <path class="plaster" d="M-32.8571 -38 h13.1429 v10 a6.57143 6.57143 0 0 1 -13.1429 0 Z" />
+            <path class="roof" d="M-19.7143 -38 h13.1429 v10 a6.57143 6.57143 0 0 1 -13.1429 0 Z" />
+            <path class="plaster" d="M-6.57143 -38 h13.1429 v10 a6.57143 6.57143 0 0 1 -13.1429 0 Z" />
+            <path class="roof" d="M6.57143 -38 h13.1429 v10 a6.57143 6.57143 0 0 1 -13.1429 0 Z" />
+            <path class="plaster" d="M19.7143 -38 h13.1429 v10 a6.57143 6.57143 0 0 1 -13.1429 0 Z" />
+            <path class="roof" d="M32.8571 -38 h13.1429 v10 a6.57143 6.57143 0 0 1 -13.1429 0 Z" />
+            <rect class="window" x="-36" y="-22" width="24" height="16" />
+            <rect class="window" x="12" y="-22" width="24" height="16" />
+            <path d="M-24 -22 V-6 M24 -22 V-6" />
+            <path class="door" d="M-9 0 V-16 a9 9 0 0 1 18 0 V0 Z" />
+            </g>
+            <text class="label" y="36">About</text>
           </g>
 
-          <g class="checkpoint" data-node="2" transform="translate(480 200)">
+          <g class="checkpoint" data-node="2" transform="translate(480 450)">
             <title>Projects</title>
-            <ellipse class="pad" cx="0" cy="0" rx="16" ry="5" />
-            <rect class="outline" x="-45" y="-50" width="90" height="50" />
-            <path class="outline" d="M-45 -50 L-45 -76 L-15 -50 L-15 -76 L15 -50 L15 -76 L45 -50" />
-            <path class="door" d="M-11 0 V-22 A11 11 0 0 1 11 -22 V0 Z" />
-            <text class="label" y="-88">Projects</text>
+            <g class="scenery shop">
+            <rect class="stone" x="-46" y="-72" width="92" height="72" />
+            <rect class="slate" x="-50" y="-78" width="100" height="6" />
+            <rect class="plaster" x="-20" y="-66" width="40" height="16" />
+            <path d="M-6 -53 L4 -63 M1 -64 l5 5 l-2 2 l-5 -5 Z" />
+            <path class="slate" d="M-50 -44 h14.2857 v10 a7.14286 7.14286 0 0 1 -14.2857 0 Z" />
+            <path class="plaster" d="M-35.7143 -44 h14.2857 v10 a7.14286 7.14286 0 0 1 -14.2857 0 Z" />
+            <path class="slate" d="M-21.4286 -44 h14.2857 v10 a7.14286 7.14286 0 0 1 -14.2857 0 Z" />
+            <path class="plaster" d="M-7.14286 -44 h14.2857 v10 a7.14286 7.14286 0 0 1 -14.2857 0 Z" />
+            <path class="slate" d="M7.14286 -44 h14.2857 v10 a7.14286 7.14286 0 0 1 -14.2857 0 Z" />
+            <path class="plaster" d="M21.4286 -44 h14.2857 v10 a7.14286 7.14286 0 0 1 -14.2857 0 Z" />
+            <path class="slate" d="M35.7143 -44 h14.2857 v10 a7.14286 7.14286 0 0 1 -14.2857 0 Z" />
+            <rect class="window" x="-40" y="-28" width="28" height="22" />
+            <rect class="window" x="12" y="-28" width="28" height="22" />
+            <path d="M-26 -28 V-6 M26 -28 V-6" />
+            <path class="door" d="M-9 0 V-22 a9 9 0 0 1 18 0 V0 Z" />
+            </g>
+            <text class="label" y="36">Projects</text>
           </g>
 
-          <g class="checkpoint" data-node="3" transform="translate(700 330)">
+          <g class="checkpoint" data-node="3" transform="translate(680 450)">
             <title>Experience</title>
-            <ellipse class="pad" cx="0" cy="0" rx="16" ry="5" />
-            <path class="outline" d="M-24 0 V-104 h8 v8 h8 v-8 h8 v8 h8 v-8 h8 v8 h8 v-8 h8 V0" />
-            <path class="outline" d="M-6 -66 v-12 a6 6 0 0 1 12 0 v12 Z" />
-            <path class="door" d="M-10 0 V-20 A10 10 0 0 1 10 -20 V0 Z" />
-            <text class="label" y="30">Experience</text>
+            <g class="scenery shop">
+            <rect class="stone" x="-42" y="-70" width="84" height="70" />
+            <rect class="roof" x="-46" y="-76" width="92" height="6" />
+            <rect class="plaster" x="-20" y="-64" width="40" height="16" />
+            <path d="M-3 -55 l-2 6 l3 -2 l2 3 l1 -6 M3 -55 l2 6 l-3 -2 l-2 3" /><circle class="flag" cx="0" cy="-58" r="4" />
+            <path class="roof" d="M-46 -42 h13.1429 v10 a6.57143 6.57143 0 0 1 -13.1429 0 Z" />
+            <path class="plaster" d="M-32.8571 -42 h13.1429 v10 a6.57143 6.57143 0 0 1 -13.1429 0 Z" />
+            <path class="roof" d="M-19.7143 -42 h13.1429 v10 a6.57143 6.57143 0 0 1 -13.1429 0 Z" />
+            <path class="plaster" d="M-6.57143 -42 h13.1429 v10 a6.57143 6.57143 0 0 1 -13.1429 0 Z" />
+            <path class="roof" d="M6.57143 -42 h13.1429 v10 a6.57143 6.57143 0 0 1 -13.1429 0 Z" />
+            <path class="plaster" d="M19.7143 -42 h13.1429 v10 a6.57143 6.57143 0 0 1 -13.1429 0 Z" />
+            <path class="roof" d="M32.8571 -42 h13.1429 v10 a6.57143 6.57143 0 0 1 -13.1429 0 Z" />
+            <rect class="window" x="-36" y="-26" width="24" height="20" />
+            <rect class="window" x="12" y="-26" width="24" height="20" />
+            <path d="M-24 -26 V-6 M24 -26 V-6" />
+            <path class="door" d="M-9 0 V-20 a9 9 0 0 1 18 0 V0 Z" />
+            </g>
+            <text class="label" y="36">Experience</text>
           </g>
 
-          <g class="checkpoint" data-node="4" transform="translate(900 160)">
+          <g class="checkpoint" data-node="4" transform="translate(880 450)">
             <title>Contact</title>
-            <ellipse class="pad" cx="0" cy="0" rx="16" ry="5" />
-            <rect class="outline" x="-40" y="-60" width="80" height="60" />
-            <path class="outline" d="M-46 -60 h92 v-6 h-92 Z" />
-            <rect class="outline" x="-14" y="-52" width="28" height="16" />
-            <path class="outline" d="M-14 -52 L0 -42 L14 -52" />
-            <rect class="door" x="-10" y="-28" width="20" height="28" />
-            <text class="label" y="-80">Contact</text>
+            <g class="scenery shop">
+            <rect class="plaster" x="-44" y="-64" width="88" height="64" />
+            <rect class="slate" x="-48" y="-70" width="96" height="6" />
+            <rect class="plaster" x="-20" y="-58" width="40" height="16" />
+            <path d="M-7 -54 h14 v9 h-14 Z M-7 -54 l7 5 l7 -5" />
+            <path class="slate" d="M-48 -36 h13.7143 v10 a6.85714 6.85714 0 0 1 -13.7143 0 Z" />
+            <path class="plaster" d="M-34.2857 -36 h13.7143 v10 a6.85714 6.85714 0 0 1 -13.7143 0 Z" />
+            <path class="slate" d="M-20.5714 -36 h13.7143 v10 a6.85714 6.85714 0 0 1 -13.7143 0 Z" />
+            <path class="plaster" d="M-6.85714 -36 h13.7143 v10 a6.85714 6.85714 0 0 1 -13.7143 0 Z" />
+            <path class="slate" d="M6.85714 -36 h13.7143 v10 a6.85714 6.85714 0 0 1 -13.7143 0 Z" />
+            <path class="plaster" d="M20.5714 -36 h13.7143 v10 a6.85714 6.85714 0 0 1 -13.7143 0 Z" />
+            <path class="slate" d="M34.2857 -36 h13.7143 v10 a6.85714 6.85714 0 0 1 -13.7143 0 Z" />
+            <rect class="window" x="-38" y="-20" width="26" height="14" />
+            <rect class="window" x="12" y="-20" width="26" height="14" />
+            <path d="M-25 -20 V-6 M25 -20 V-6" />
+            <path class="door" d="M-9 0 V-14 a9 9 0 0 1 18 0 V0 Z" />
+            </g>
+            <text class="label" y="36">Contact</text>
           </g>
 
           <!-- ── The walker (feet at 0,0) ────────────────────────── -->
-          <g id="walker" class="walker" transform="translate(90 470)" aria-hidden="true">
+          <g id="walker" class="walker" transform="translate(80 450)" aria-hidden="true">
             <g id="walkerBody" class="walker-body">
               <g class="walker-face">
                 <line id="legL" x1="0" y1="-14" x2="-4" y2="0" />
