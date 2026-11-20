@@ -119,6 +119,7 @@
             </g>
 
             <!-- near layer: tall townhouses lining the street -->
+            <g class="near">
             <rect class="plaster" x="-6" y="320" width="52" height="120" />
             <path class="roof" d="M-9 320 L20 290 L49 320 Z" />
             <path d="M-6 338 H46 M-6 360 H46 M-6 320 L20 338 L46 320" />
@@ -328,6 +329,7 @@
             <rect class="window" x="1009" y="392" width="8" height="10" />
             <path class="door" d="M997 440 v-14 a6 6 0 0 1 12 0 v14 Z" />
 
+            </g>
             <!-- trees between the shops -->
             <g class="trees">
             <g transform="translate(180 440)"><path d="M0 0 v-12" /><circle cx="0" cy="-24" r="12" /></g>
@@ -452,17 +454,27 @@
             <text class="label" y="36">Contact</text>
           </g>
 
-          <!-- ── The walker (feet at 0,0) ────────────────────────── -->
+          <!-- ── Pets that join the line (filled in by js/home.js) ── -->
+          <g id="pets" class="pets" aria-hidden="true"></g>
+
+          <!-- ── The walker: a wizard (feet at 0,0, facing right) ── -->
           <g id="walker" class="walker" transform="translate(80 450)" aria-hidden="true">
             <g id="walkerBody" class="walker-body">
               <g class="walker-face">
-                <line id="legL" x1="0" y1="-14" x2="-4" y2="0" />
-                <line id="legR" x1="0" y1="-14" x2="4" y2="0" />
-                <line x1="0" y1="-14" x2="0" y2="-29" />
-                <line id="armL" x1="0" y1="-26" x2="-6" y2="-17" />
-                <line id="armR" x1="0" y1="-26" x2="6" y2="-17" />
-                <circle cx="0" cy="-36" r="7" />
-                <path d="M-7 -40 h17" />
+                <line id="legL" x1="0" y1="-10" x2="-4" y2="0" />
+                <line id="legR" x1="0" y1="-10" x2="4" y2="0" />
+                <line id="armL" x1="-3" y1="-25" x2="-9" y2="-16" />
+                <path class="robe" d="M-10 -6 L-5 -29 H5 L10 -6 Q0 -3 -10 -6 Z" />
+                <path class="trim" d="M-5 -29 H5 M0 -29 V-7" />
+                <line class="staff" x1="12" y1="-40" x2="12" y2="-1" />
+                <circle class="orb" cx="12" cy="-43" r="3.5" />
+                <line id="armR" x1="3" y1="-25" x2="11" y2="-20" />
+                <circle class="face" cx="0" cy="-35" r="6" />
+                <path class="beard" d="M-5 -33 Q-3 -20 1 -18 Q5 -21 6 -33 Q0 -30 -5 -33 Z" />
+                <circle class="eye" cx="3" cy="-36" r="0.9" />
+                <path class="hat" d="M-8 -39 Q-3 -50 -6 -62 Q3 -55 7 -39 Z" />
+                <path class="brim" d="M-11 -39 H11" />
+                <path class="star" d="M0 -48 l1.2 2.4 2.6 .4 -1.9 1.8 .5 2.6 -2.4 -1.2 -2.4 1.2 .5 -2.6 -1.9 -1.8 2.6 -.4 Z" />
               </g>
             </g>
           </g>
