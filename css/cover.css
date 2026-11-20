@@ -1,0 +1,106 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  height: 100%;
+  background: #fff;
+  color: #000;
+}
+
+body {
+  font-family: "Latin Modern", "Times New Roman", serif;
+}
+
+.cover {
+  overflow: hidden;
+  min-height: 100vh;
+  min-height: 100svh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 16px;
+}
+
+.name {
+  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: baseline;
+  font-size: clamp(3rem, 14vw, 10rem);
+  font-weight: 400;
+  line-height: 1;
+  user-select: none;
+}
+
+/* Clicking the O: zoom slowly into the hole of the O */
+.name.zooming {
+  transition: transform 2.2s cubic-bezier(0.55, 0, 0.9, 0.35);
+  pointer-events: none;
+}
+
+.space {
+  width: 0.3em;
+}
+
+.letter {
+  position: relative;
+  display: inline-block;
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  color: inherit;
+  text-decoration: none;
+  cursor: pointer;
+  transition: transform 0.15s ease;
+}
+
+.letter:hover {
+  transform: translateY(-0.04em);
+}
+
+.letter:focus-visible {
+  outline: 2px solid #000;
+  outline-offset: 0.1em;
+}
+
+/* Left-pointing arrow that appears above a wrong letter */
+.letter .hint {
+  position: absolute;
+  left: 50%;
+  bottom: 100%;
+  font-size: 0.35em;
+  font-weight: 400;
+  line-height: 1;
+  pointer-events: none;
+  animation: hint 1.1s ease forwards;
+}
+
+@keyframes hint {
+  0%   { opacity: 0; transform: translate(-50%, 0.3em); }
+  20%  { opacity: 1; transform: translate(-50%, 0); }
+  45%  { transform: translate(-80%, 0); }
+  60%  { transform: translate(-50%, 0); }
+  75%  { opacity: 1; transform: translate(-80%, 0); }
+  100% { opacity: 0; transform: translate(-80%, 0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .letter {
+    transition: none;
+  }
+  .letter .hint {
+    animation: hint-fade 1.1s linear forwards;
+    transform: translate(-50%, 0);
+  }
+  @keyframes hint-fade {
+    0%, 70% { opacity: 1; }
+    100%    { opacity: 0; }
+  }
+}

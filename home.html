@@ -1,0 +1,192 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Otis Hunt</title>
+  <link rel="stylesheet" href="css/fonts.css">
+  <link rel="stylesheet" href="css/home.css">
+</head>
+<body>
+  <main class="world" id="world">
+    <aside class="key" aria-label="Controls">
+      <p class="key-title">Key</p>
+      <div class="key-row">
+        <div class="arrows" aria-hidden="true">
+          <kbd class="up">↑</kbd>
+          <kbd class="left">←</kbd><kbd class="down">↓</kbd><kbd class="right">→</kbd>
+        </div>
+        <span>Walk</span>
+      </div>
+      <div class="key-row">
+        <kbd class="wide">Enter</kbd>
+        <span>Go inside</span>
+      </div>
+    </aside>
+
+    <header class="title">
+      <h1>Otis Hunt</h1>
+      <p class="subtitle">Portfolio</p>
+    </header>
+
+    <figure class="map-figure">
+      <div class="map-scroll" id="mapScroll">
+      <div class="map-wrap" id="mapWrap">
+        <svg class="map" id="map" viewBox="0 0 1000 600" role="img"
+             aria-label="Map of the portfolio. Walk the figure to a checkpoint and go inside.">
+
+          <!-- ── Scenery ─────────────────────────────────────────── -->
+          <g class="scenery" aria-hidden="true">
+            <!-- clouds -->
+            <path d="M150 100 a18 18 0 0 1 30 -16 a24 24 0 0 1 44 6 a16 16 0 0 1 6 30 h-76 a14 14 0 0 1 -4 -20 z" />
+            <path d="M600 80 a14 14 0 0 1 24 -12 a20 20 0 0 1 36 5 a13 13 0 0 1 4 24 h-60 a11 11 0 0 1 -4 -17 z" />
+
+            <!-- sun -->
+            <circle cx="790" cy="62" r="16" />
+            <path d="M790 34 v-10 M790 90 v10 M762 62 h-10 M818 62 h10
+                     M770 42 l-7 -7 M810 42 l7 -7 M770 82 l-7 7 M810 82 l7 7" />
+
+            <!-- lake -->
+            <ellipse cx="130" cy="230" rx="78" ry="32" />
+            <path d="M85 225 q8 -6 16 0 t16 0 M120 240 q8 -6 16 0 t16 0 M150 218 q8 -6 16 0 t16 0" />
+
+            <!-- hills -->
+            <path d="M540 580 Q 640 440 740 580" />
+            <path d="M690 580 Q 800 470 910 580" />
+            <path d="M860 580 Q 940 500 1000 560" />
+
+            <!-- trees -->
+            <g transform="translate(205 330)"><path d="M0 0 v-14 M-12 -14 L0 -44 L12 -14 Z" /></g>
+            <g transform="translate(232 345)"><path d="M0 0 v-12 M-10 -12 L0 -36 L10 -12 Z" /></g>
+            <g transform="translate(395 500)"><path d="M0 0 v-14 M-12 -14 L0 -44 L12 -14 Z" /></g>
+            <g transform="translate(575 445)"><path d="M0 0 v-14 M-12 -14 L0 -44 L12 -14 Z" /></g>
+            <g transform="translate(600 460)"><path d="M0 0 v-12 M-10 -12 L0 -36 L10 -12 Z" /></g>
+            <g transform="translate(360 130)"><path d="M0 0 v-14 M-12 -14 L0 -44 L12 -14 Z" /></g>
+            <g transform="translate(830 430)"><path d="M0 0 v-14 M-12 -14 L0 -44 L12 -14 Z" /></g>
+            <g transform="translate(960 330)"><path d="M0 0 v-12 M-10 -12 L0 -36 L10 -12 Z" /></g>
+            <g transform="translate(60 390)"><path d="M0 0 v-12 M-10 -12 L0 -36 L10 -12 Z" /></g>
+
+            <!-- grass ticks -->
+            <path d="M260 520 l4 -8 l4 8 M470 300 l4 -8 l4 8 M650 250 l4 -8 l4 8
+                     M120 540 l4 -8 l4 8 M930 240 l4 -8 l4 8 M520 520 l4 -8 l4 8" />
+          </g>
+
+          <!-- ── Path between checkpoints (one segment per hop) ──── -->
+          <g class="trail" aria-hidden="true">
+            <path id="seg-0" d="M90 470 C 160 470, 220 400, 300 380" />
+            <path id="seg-1" d="M300 380 C 380 360, 380 210, 480 200" />
+            <path id="seg-2" d="M480 200 C 580 190, 600 340, 700 330" />
+            <path id="seg-3" d="M700 330 C 800 320, 820 170, 900 160" />
+          </g>
+
+          <!-- ── Checkpoints (door base sits on the path point) ──── -->
+          <g class="checkpoint" data-node="0" transform="translate(90 470)">
+            <title>Start</title>
+            <ellipse class="pad" cx="0" cy="0" rx="16" ry="5" />
+            <path class="outline" d="M-34 4 v-88 M-34 -84 h54 l10 10 l-10 10 h-54" />
+            <text x="-6" y="-69" class="sign">START</text>
+            <text class="label" y="30">Start</text>
+          </g>
+
+          <g class="checkpoint" data-node="1" transform="translate(300 380)">
+            <title>About</title>
+            <ellipse class="pad" cx="0" cy="0" rx="16" ry="5" />
+            <rect class="outline" x="-35" y="-55" width="70" height="55" />
+            <path class="outline" d="M-45 -55 L0 -92 L45 -55 Z" />
+            <rect class="outline" x="19" y="-44" width="10" height="10" />
+            <rect class="door" x="-10" y="-30" width="20" height="30" />
+            <text class="label" y="30">About</text>
+          </g>
+
+          <g class="checkpoint" data-node="2" transform="translate(480 200)">
+            <title>Projects</title>
+            <ellipse class="pad" cx="0" cy="0" rx="16" ry="5" />
+            <rect class="outline" x="-45" y="-50" width="90" height="50" />
+            <path class="outline" d="M-45 -50 L-45 -76 L-15 -50 L-15 -76 L15 -50 L15 -76 L45 -50" />
+            <path class="door" d="M-11 0 V-22 A11 11 0 0 1 11 -22 V0 Z" />
+            <text class="label" y="-88">Projects</text>
+          </g>
+
+          <g class="checkpoint" data-node="3" transform="translate(700 330)">
+            <title>Experience</title>
+            <ellipse class="pad" cx="0" cy="0" rx="16" ry="5" />
+            <path class="outline" d="M-24 0 V-104 h8 v8 h8 v-8 h8 v8 h8 v-8 h8 v8 h8 v-8 h8 V0" />
+            <path class="outline" d="M-6 -66 v-12 a6 6 0 0 1 12 0 v12 Z" />
+            <path class="door" d="M-10 0 V-20 A10 10 0 0 1 10 -20 V0 Z" />
+            <text class="label" y="30">Experience</text>
+          </g>
+
+          <g class="checkpoint" data-node="4" transform="translate(900 160)">
+            <title>Contact</title>
+            <ellipse class="pad" cx="0" cy="0" rx="16" ry="5" />
+            <rect class="outline" x="-40" y="-60" width="80" height="60" />
+            <path class="outline" d="M-46 -60 h92 v-6 h-92 Z" />
+            <rect class="outline" x="-14" y="-52" width="28" height="16" />
+            <path class="outline" d="M-14 -52 L0 -42 L14 -52" />
+            <rect class="door" x="-10" y="-28" width="20" height="28" />
+            <text class="label" y="-80">Contact</text>
+          </g>
+
+          <!-- ── The walker (feet at 0,0) ────────────────────────── -->
+          <g id="walker" class="walker" transform="translate(90 470)" aria-hidden="true">
+            <g id="walkerBody" class="walker-body">
+              <g class="walker-face">
+                <line id="legL" x1="0" y1="-14" x2="-4" y2="0" />
+                <line id="legR" x1="0" y1="-14" x2="4" y2="0" />
+                <line x1="0" y1="-14" x2="0" y2="-29" />
+                <line id="armL" x1="0" y1="-26" x2="-6" y2="-17" />
+                <line id="armR" x1="0" y1="-26" x2="6" y2="-17" />
+                <circle cx="0" cy="-36" r="7" />
+                <path d="M-7 -40 h17" />
+              </g>
+            </g>
+          </g>
+        </svg>
+      </div>
+      </div>
+
+      <figcaption>
+        <span class="fig">Figure 1:</span>
+        <span id="status">Use ← → to walk. Press Enter to go inside.</span>
+      </figcaption>
+
+      <div class="controls" aria-label="Map controls">
+        <button type="button" id="btnPrev" aria-label="Walk back">←</button>
+        <button type="button" id="btnEnter">Enter</button>
+        <button type="button" id="btnNext" aria-label="Walk forward">→</button>
+      </div>
+    </figure>
+  </main>
+
+  <!-- ── Sections (opened by walking into a checkpoint) ───────────
+       Edit the content inside each <section> below. -->
+  <section class="page" id="about" hidden>
+    <a class="back" href="#">← Back to map</a>
+    <h2>About</h2>
+    <p>Write a short introduction here: who you are, what you do, and what you care about.</p>
+  </section>
+
+  <section class="page" id="projects" hidden>
+    <a class="back" href="#">← Back to map</a>
+    <h2>Projects</h2>
+    <h3>Project name</h3>
+    <p>One or two sentences on what it is and what you did. Add a link or image.</p>
+    <h3>Another project</h3>
+    <p>Describe it here.</p>
+  </section>
+
+  <section class="page" id="experience" hidden>
+    <a class="back" href="#">← Back to map</a>
+    <h2>Experience</h2>
+    <p>List roles, schools, or anything else you want to show.</p>
+  </section>
+
+  <section class="page" id="contact" hidden>
+    <a class="back" href="#">← Back to map</a>
+    <h2>Contact</h2>
+    <p>Add your email and links here.</p>
+  </section>
+
+  <script src="js/home.js"></script>
+</body>
+</html>

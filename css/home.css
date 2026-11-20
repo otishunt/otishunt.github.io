@@ -1,0 +1,373 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  background: #fff;
+  color: #000;
+}
+
+body {
+  font-family: "Latin Modern", "Times New Roman", serif;
+  font-size: 18px;
+  line-height: 1.5;
+  animation: arrive 0.6s ease both;
+}
+
+@keyframes arrive {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+button,
+a {
+  font: inherit;
+  color: inherit;
+}
+
+/* ── Map screen ─────────────────────────────────────────────── */
+.world {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 40px 16px 32px;
+  overflow: hidden;
+}
+
+/* Key (top left) */
+.key {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  padding: 10px 14px 12px;
+  border: 1.5px solid #000;
+  background: #fff;
+  font-size: 15px;
+  line-height: 1.2;
+  z-index: 1;
+  transition: opacity 0.4s ease;
+}
+
+.key-title {
+  margin: 0 0 8px;
+  font-weight: 700;
+}
+
+.key-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.key-row + .key-row {
+  margin-top: 10px;
+}
+
+.arrows {
+  display: grid;
+  grid-template-columns: repeat(3, 24px);
+  grid-template-rows: 24px 24px;
+  gap: 3px;
+}
+
+.arrows .up    { grid-column: 2; grid-row: 1; }
+.arrows .left  { grid-column: 1; grid-row: 2; }
+.arrows .down  { grid-column: 2; grid-row: 2; }
+.arrows .right { grid-column: 3; grid-row: 2; }
+
+kbd {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 24px;
+  height: 24px;
+  border: 1.2px solid #000;
+  border-radius: 3px;
+  box-shadow: 0 2px 0 #000;
+  font-family: inherit;
+  font-size: 14px;
+  line-height: 1;
+}
+
+kbd.wide {
+  width: 81px; /* same width as the arrow cluster */
+}
+
+.world.leaving .key {
+  opacity: 0;
+}
+
+/* Narrow screens: put the key above the title so they don't overlap */
+@media (max-width: 760px) {
+  .key {
+    position: static;
+    display: inline-block;
+    margin-bottom: 16px;
+  }
+}
+
+/* Touch-only devices have no arrow keys; they use the buttons under the map */
+@media (hover: none) and (pointer: coarse) {
+  .key {
+    display: none;
+  }
+}
+
+.title {
+  text-align: center;
+  margin-bottom: 16px;
+}
+
+.title h1 {
+  margin: 0;
+  font-size: clamp(2rem, 6vw, 2.8rem);
+  font-weight: 400;
+  line-height: 1.1;
+}
+
+.subtitle {
+  margin: 6px 0 0;
+  font-size: 1.15rem;
+}
+
+.map-figure {
+  margin: 0;
+}
+
+.map-scroll {
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: none;
+}
+
+.map-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+.world.leaving .map-scroll {
+  overflow: hidden;
+}
+
+.map-wrap {
+  transform-origin: 0 0;
+}
+
+/* On narrow screens keep the map readable and let it scroll with the walker */
+@media (max-width: 720px) {
+  .map-wrap {
+    width: 760px;
+  }
+}
+
+.map-wrap.zooming {
+  transition: transform 1.4s cubic-bezier(0.55, 0, 0.9, 0.35);
+}
+
+.map {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+
+.map text {
+  font-family: "Latin Modern", "Times New Roman", serif;
+}
+
+.scenery {
+  fill: none;
+  stroke: #000;
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  opacity: 0.55;
+}
+
+.trail path {
+  fill: none;
+  stroke: #000;
+  stroke-width: 4;
+  stroke-linecap: round;
+  stroke-dasharray: 0 14;
+}
+
+.checkpoint {
+  cursor: pointer;
+}
+
+.checkpoint .outline,
+.checkpoint .door,
+.checkpoint .pad {
+  fill: #fff;
+  stroke: #000;
+  stroke-width: 2;
+  stroke-linejoin: round;
+}
+
+.checkpoint .label {
+  font-size: 20px;
+  text-anchor: middle;
+}
+
+.checkpoint .sign {
+  font-size: 13px;
+  letter-spacing: 0.08em;
+  text-anchor: middle;
+}
+
+.checkpoint:hover .label,
+.checkpoint.here .label {
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+/* Walker */
+.walker line,
+.walker path,
+.walker circle {
+  fill: #fff;
+  stroke: #000;
+  stroke-width: 2.5;
+  stroke-linecap: round;
+}
+
+.walker-body {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  transition: transform 0.6s ease-in, opacity 0.6s ease-in;
+}
+
+/* Hide everything but the map while zooming into a door */
+.title,
+figcaption,
+.controls {
+  transition: opacity 0.4s ease;
+}
+
+.world.leaving .title,
+.world.leaving figcaption,
+.world.leaving .controls {
+  opacity: 0;
+}
+
+.world.leaving .scenery,
+.world.leaving .trail,
+.world.leaving .walker {
+  pointer-events: none;
+}
+
+.walker.idle .walker-body {
+  animation: bob 1.6s ease-in-out infinite;
+}
+
+@keyframes bob {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-2px); }
+}
+
+/* Walking in: shrink into the doorway */
+.walker.entering .walker-body {
+  animation: none;
+  transform: translateY(-6px) scale(0.35);
+  opacity: 0;
+}
+
+/* Caption + controls */
+figcaption {
+  margin-top: 12px;
+  text-align: center;
+  min-height: 1.5em;
+}
+
+.fig {
+  margin-right: 0.3em;
+}
+
+.controls {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.controls button {
+  min-width: 48px;
+  min-height: 44px;
+  padding: 0 16px;
+  background: #fff;
+  border: 1.5px solid #000;
+  border-radius: 0;
+  cursor: pointer;
+}
+
+.controls button:hover {
+  background: #000;
+  color: #fff;
+}
+
+.controls button:focus-visible,
+.back:focus-visible {
+  outline: 2px solid #000;
+  outline-offset: 3px;
+}
+
+/* ── Section pages ──────────────────────────────────────────── */
+.page {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 40px 16px 64px;
+  animation: arrive 0.5s ease both;
+}
+
+.page[hidden] {
+  display: none;
+}
+
+.back {
+  display: inline-block;
+  margin-bottom: 32px;
+  text-decoration: none;
+}
+
+.back:hover {
+  text-decoration: underline;
+}
+
+.page h2:focus {
+  outline: none;
+}
+
+.page h2 {
+  font-size: 1.9rem;
+  font-weight: 700;
+  margin: 0 0 16px;
+  line-height: 1.2;
+}
+
+.page h3 {
+  font-size: 1.3rem;
+  font-weight: 700;
+  margin: 28px 0 8px;
+}
+
+.page p {
+  text-align: justify;
+  hyphens: auto;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body,
+  .page {
+    animation: none;
+  }
+  .walker.idle .walker-body {
+    animation: none;
+  }
+  .walker-body,
+  .map-wrap.zooming {
+    transition: none;
+  }
+}
