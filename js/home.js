@@ -77,7 +77,7 @@
     if (current === 0) {
       statusEl.textContent = 'Use → to walk to the first checkpoint, or tap one on the map.';
     } else {
-      statusEl.textContent = NODES[current].name + ': press Enter (or tap it again) to go inside.';
+      statusEl.textContent = NODES[current].name + ': press Space (or tap it again) to go inside.';
     }
   }
 
