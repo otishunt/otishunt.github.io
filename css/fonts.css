@@ -31,3 +31,28 @@
   font-style: normal;
   font-display: swap;
 }
+
+/* Scroll pages — IM Fell English (Igino Marini) and Uncial Antiqua (Astigmatic), both SIL Open Font License */
+@font-face {
+  font-family: "IM Fell English";
+  src: url("../fonts/IMFellEnglish-Regular.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "IM Fell English";
+  src: url("../fonts/IMFellEnglish-Italic.woff2") format("woff2");
+  font-weight: 400;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Uncial Antiqua";
+  src: url("../fonts/UncialAntiqua-Regular.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}

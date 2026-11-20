@@ -147,6 +147,7 @@
     var flip = document.createElementNS(SVG_NS, 'g');
     var hop = document.createElementNS(SVG_NS, 'g');
     var art = document.createElementNS(SVG_NS, 'g');
+    art.setAttribute('class', 'pet-art');
     art.innerHTML = PETS[node].art;
     hop.appendChild(art);
     flip.appendChild(hop);
@@ -181,9 +182,43 @@
     if (joining) requestAnimationFrame(renderPets);
   }
 
+  // Before it joins, each pet sits in its shop's front window.
+  var residents = {};
+  function makeResidents() {
+    var defs = document.createElementNS(SVG_NS, 'defs');
+    svg.insertBefore(defs, svg.firstChild);
+    Object.keys(PETS).forEach(function (node) {
+      var cp = checkpoints[node];
+      var win = cp && cp.querySelector('.shop rect.window');
+      if (!win) return;
+      var x = +win.getAttribute('x'), y = +win.getAttribute('y');
+      var w = +win.getAttribute('width'), h = +win.getAttribute('height');
+
+      var clip = document.createElementNS(SVG_NS, 'clipPath');
+      clip.setAttribute('id', 'shop-window-' + node);
+      clip.innerHTML = '<rect x="' + x + '" y="' + y + '" width="' + w + '" height="' + h + '" />';
+      defs.appendChild(clip);
+
+      var wrap = document.createElementNS(SVG_NS, 'g');
+      wrap.setAttribute('class', 'resident-wrap');
+      wrap.setAttribute('clip-path', 'url(#shop-window-' + node + ')');
+      var place = document.createElementNS(SVG_NS, 'g');
+      place.setAttribute('transform', 'translate(' + (x + w / 2) + ' ' + (y + h - 1) + ') scale(0.72)');
+      var art = document.createElementNS(SVG_NS, 'g');
+      art.setAttribute('class', 'pet-art resident');
+      art.style.animationDelay = (-0.4 * node) + 's';
+      art.innerHTML = PETS[node].art;
+      place.appendChild(art);
+      wrap.appendChild(place);
+      cp.insertBefore(wrap, cp.querySelector('.label'));
+      residents[node] = wrap;
+    });
+  }
+
   function addPet(node, animate) {
     if (!PETS[node]) return false;
     if (pets.some(function (p) { return p.node === node; })) return false;
+    if (residents[node]) residents[node].classList.add('gone');
     var pet = makePet(node);
     pets.push(pet);
     if (animate) {
@@ -377,9 +412,23 @@
     pages.forEach(function (p) { p.hidden = p.id !== id; });
     window.scrollTo(0, 0);
     var page = document.getElementById(id);
+    inkIn(page);
     var heading = page.querySelector('h2');
     heading.setAttribute('tabindex', '-1');
     heading.focus({ preventScroll: true });
+  }
+
+  // Write the scroll's text in, one piece after another, like fresh ink.
+  function inkIn(page) {
+    if (reduceMotion) return;
+    var pieces = page.querySelectorAll('.scroll h2, .scroll h3, .scroll p, .scroll li, .scroll .portrait');
+    page.classList.remove('inking');
+    void page.offsetWidth; // restart the animation each time the scroll opens
+    Array.prototype.forEach.call(pieces, function (el, i) {
+      el.classList.add('ink');
+      el.style.animationDelay = (0.25 + i * 0.4) + 's';
+    });
+    page.classList.add('inking');
   }
 
   // ── Remember where the walker was (per tab, optional) ─────────
@@ -456,6 +505,7 @@
   // ── Start ──────────────────────────────────────────────────────
   current = target = loadNode();
   resetTrail(nodePoint(current));
+  makeResidents();
   loadPets().forEach(function (n) { addPet(n, false); });
   place(nodePoint(current));
   pose(0);

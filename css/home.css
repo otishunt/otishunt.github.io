@@ -262,27 +262,46 @@ kbd.space {
 .walker .star         { stroke-width: 0.8; }
 
 /* Pets in the conga line */
-.pets path,
-.pets circle,
-.pets ellipse,
-.pets line {
+.pet-art path,
+.pet-art circle,
+.pet-art ellipse,
+.pet-art line {
   stroke: #000;
+  stroke-opacity: 1;
   stroke-width: 1.5;
   stroke-linecap: round;
   stroke-linejoin: round;
 }
 
-.pets .nofill { fill: none; }
-.pets .dot    { fill: #000; stroke: none; }
-.pets .eyeY   { fill: #ffc21a; stroke: none; }
-.pets .white  { fill: #fff; }
-.pets .cat    { fill: #3d3a45; }
-.pets .frog   { fill: #9fd88a; }
-.pets .owl    { fill: #c9a27e; }
-.pets .owl2   { fill: #e9d6c0; }
-.pets .beak   { fill: #ff8c1a; }
-.pets .dragon { fill: #e8836b; }
-.pets .wing   { fill: #f6c2a8; }
+.pet-art .nofill { fill: none; }
+.pet-art .dot    { fill: #000; stroke: none; }
+.pet-art .eyeY   { fill: #ffc21a; stroke: none; }
+.pet-art .white  { fill: #fff; }
+.pet-art .cat    { fill: #3d3a45; }
+.pet-art .frog   { fill: #9fd88a; }
+.pet-art .owl    { fill: #c9a27e; }
+.pet-art .owl2   { fill: #e9d6c0; }
+.pet-art .beak   { fill: #ff8c1a; }
+.pet-art .dragon { fill: #e8836b; }
+.pet-art .wing   { fill: #f6c2a8; }
+
+/* Pets waiting in the shop windows */
+.resident {
+  animation: resident-bob 2.4s ease-in-out infinite;
+}
+
+@keyframes resident-bob {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-2.5px); }
+}
+
+.resident-wrap {
+  transition: opacity 0.3s ease;
+}
+
+.resident-wrap.gone {
+  opacity: 0;
+}
 
 .pet-pop {
   animation: pet-pop 0.45s ease-out;
@@ -376,11 +395,16 @@ figcaption {
   outline-offset: 3px;
 }
 
-/* ── Section pages ──────────────────────────────────────────── */
+/* ── Section pages: wizard scrolls ─────────────────────────── */
 .page {
-  max-width: 720px;
+  --parchment: #f3e2bd;
+  --parchment-edge: #dcbf86;
+  --ink: #3a2516;
+  --ink-red: #8f2a1c;     /* rubric red for drop caps */
+  --rod: #8a5a2b;         /* wooden scroll rods */
+  max-width: 760px;
   margin: 0 auto;
-  padding: 40px 16px 64px;
+  padding: 32px 16px 72px;
   animation: arrive 0.5s ease both;
 }
 
@@ -390,7 +414,8 @@ figcaption {
 
 .back {
   display: inline-block;
-  margin-bottom: 32px;
+  margin-bottom: 36px;
+  font-family: "Lower Pixel", "Latin Modern", serif;
   text-decoration: none;
 }
 
@@ -402,6 +427,97 @@ figcaption {
   outline: none;
 }
 
+/* The parchment, with a rolled rod at the top and bottom */
+.scroll {
+  position: relative;
+  padding: 56px 56px 60px;
+  color: var(--ink);
+  font-family: "IM Fell English", "Latin Modern", Georgia, serif;
+  font-size: 21px;
+  line-height: 1.55;
+  background:
+    radial-gradient(ellipse at 20% 15%, rgba(255, 255, 255, 0.45), transparent 55%),
+    radial-gradient(ellipse at 80% 85%, rgba(160, 110, 40, 0.18), transparent 60%),
+    radial-gradient(ellipse at center, var(--parchment) 55%, var(--parchment-edge) 100%);
+  box-shadow:
+    inset 0 0 40px rgba(120, 80, 30, 0.35),
+    0 10px 24px rgba(60, 40, 15, 0.18);
+}
+
+.scroll::before,
+.scroll::after {
+  content: "";
+  position: absolute;
+  left: -18px;
+  right: -18px;
+  height: 30px;
+  border-radius: 15px;
+  background: linear-gradient(to bottom, #6b4420 0%, #c48f54 35%, #e2b67c 50%, #a8743d 70%, #5e3a1a 100%);
+  box-shadow: 0 4px 8px rgba(40, 25, 10, 0.3);
+}
+
+.scroll::before { top: -15px; }
+.scroll::after  { bottom: -15px; }
+
+.page h2 {
+  margin: 0 0 20px;
+  font-family: "Uncial Antiqua", "Latin Modern", serif;
+  font-weight: 400;
+  font-size: 2.3rem;
+  line-height: 1.15;
+  text-align: center;
+  color: var(--ink);
+}
+
+.page h2::after {
+  /* a small inked flourish under the title */
+  content: "~ \2726 ~";
+  display: block;
+  margin-top: 6px;
+  font-family: "IM Fell English", serif;
+  font-size: 1rem;
+  color: var(--ink-red);
+}
+
+.page h3 {
+  margin: 30px 0 6px;
+  font-family: "Uncial Antiqua", "Latin Modern", serif;
+  font-weight: 400;
+  font-size: 1.35rem;
+  color: var(--ink);
+}
+
+.page p {
+  margin: 0 0 14px;
+  text-align: justify;
+  hyphens: auto;
+}
+
+.page a:not(.back) {
+  color: var(--ink-red);
+}
+
+/* Illuminated drop cap on the opening paragraph */
+.scroll > h2 + p::first-letter,
+.scroll > h2 + .about .about-text p:first-child::first-letter {
+  float: left;
+  margin: 6px 8px 0 0;
+  font-family: "IM Fell English", serif;
+  font-size: 3.6em;
+  line-height: 0.8;
+  color: var(--ink-red);
+}
+
+/* Ink appearing as if a wizard is writing it, one line of the scroll at a time */
+.page.inking .ink {
+  animation: ink 1s ease-out both;
+}
+
+@keyframes ink {
+  from { clip-path: inset(0 100% 0 0); opacity: 0.2; filter: blur(1px); }
+  to   { clip-path: inset(0 0 0 0); opacity: 1; filter: none; }
+}
+
 /* About: photo beside the intro, stacked on phones */
 .about {
   display: flex;
@@ -410,12 +526,15 @@ figcaption {
 }
 
 .portrait {
-  flex: 0 0 240px;
-  width: 240px;
+  flex: 0 0 220px;
+  width: 220px;
   height: auto;
   aspect-ratio: 1;
   object-fit: cover;
-  border: 1.5px solid #000;
+  border: 3px solid var(--ink);
+  outline: 1px solid var(--ink);
+  outline-offset: 4px;
+  filter: sepia(0.25);
 }
 
 .about-text {
@@ -423,37 +542,25 @@ figcaption {
   min-width: 0;
 }
 
-.about-text p:first-child {
-  margin-top: 0;
-}
-
-@media (max-width: 560px) {
+@media (max-width: 600px) {
+  .scroll {
+    padding: 44px 24px 48px;
+    font-size: 19px;
+  }
+  .scroll::before,
+  .scroll::after {
+    left: -8px;
+    right: -8px;
+  }
   .about {
     flex-direction: column;
   }
   .portrait {
     flex-basis: auto;
     width: 100%;
-    max-width: 320px;
+    max-width: 300px;
+    align-self: center;
   }
-}
-
-.page h2 {
-  font-size: 1.9rem;
-  font-weight: 700;
-  margin: 0 0 16px;
-  line-height: 1.2;
-}
-
-.page h3 {
-  font-size: 1.3rem;
-  font-weight: 700;
-  margin: 28px 0 8px;
-}
-
-.page p {
-  text-align: justify;
-  hyphens: auto;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -462,7 +569,9 @@ figcaption {
     animation: none;
   }
   .walker.idle .walker-body,
-  .pet-pop {
+  .pet-pop,
+  .resident,
+  .page.inking .ink {
     animation: none;
   }
   .walker-body,
