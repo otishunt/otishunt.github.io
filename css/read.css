@@ -1,0 +1,201 @@
+/* The plain, readable version of the site (read.html) */
+:root {
+  --bg: #fbfaf7;
+  --text: #1f1c19;
+  --muted: #6b645c;
+  --rule: #e4dfd6;
+  --accent: #4b3fa8; /* the wizard's robe, the one nod to the town */
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #17161a;
+    --text: #ece8e1;
+    --muted: #a39d94;
+    --rule: #34313a;
+    --accent: #a99cf2;
+  }
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  background: var(--bg);
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: "EB Garamond", Georgia, serif;
+  font-size: 19px;
+  line-height: 1.6;
+  font-variant-numeric: lining-nums;
+}
+
+a {
+  color: var(--accent);
+  text-underline-offset: 3px;
+}
+
+a:hover {
+  text-decoration-thickness: 2px;
+}
+
+a:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+.sheet {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 56px 16px 64px;
+}
+
+h1,
+h2,
+h3 {
+  font-family: "Latin Modern", "EB Garamond", Georgia, serif;
+  font-weight: 400;
+  line-height: 1.2;
+}
+
+/* Name, one-line summary, and the ways to get in touch */
+.masthead {
+  padding-bottom: 24px;
+  border-bottom: 1px solid var(--rule);
+}
+
+.masthead h1 {
+  margin: 0;
+  font-size: clamp(2.4rem, 8vw, 3.2rem);
+}
+
+.tagline {
+  margin: 6px 0 14px;
+  color: var(--muted);
+}
+
+.links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 22px;
+}
+
+section {
+  padding: 28px 0 8px;
+  border-bottom: 1px solid var(--rule);
+}
+
+section:last-of-type {
+  border-bottom: 0;
+}
+
+h2 {
+  margin: 0 0 16px;
+  font-size: 1.55rem;
+}
+
+p {
+  margin: 0 0 12px;
+}
+
+/* About: photo beside the intro, stacked on phones */
+.intro {
+  display: flex;
+  gap: 24px;
+  align-items: flex-start;
+}
+
+.portrait {
+  flex: 0 0 160px;
+  width: 160px;
+  height: auto;
+  aspect-ratio: 1;
+  object-fit: cover;
+  border-radius: 6px;
+}
+
+@media (max-width: 560px) {
+  .intro {
+    flex-direction: column;
+  }
+  .portrait {
+    width: 140px;
+    flex-basis: auto;
+  }
+}
+
+/* A sub-heading inside a section (e.g. "What I work with" under About) */
+.sub {
+  margin: 18px 0 8px;
+  font-size: 1.15rem;
+}
+
+/* One job or project: name and dates on a line, role under it, then bullets */
+.entry {
+  margin-bottom: 22px;
+}
+
+.entry header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0 16px;
+}
+
+.entry h3 {
+  margin: 0;
+  font-size: 1.2rem;
+}
+
+.when {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.95em;
+  white-space: nowrap;
+}
+
+.role {
+  margin: 2px 0 8px;
+  font-style: italic;
+  color: var(--muted);
+}
+
+.entry ul {
+  margin: 0;
+  padding-left: 1.2em;
+}
+
+.entry li {
+  margin-bottom: 6px;
+}
+
+/* Contact as a simple two-column list */
+.contact {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: 6px 20px;
+  margin: 0 0 12px;
+}
+
+.contact dt {
+  color: var(--muted);
+}
+
+.contact dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.foot {
+  margin-top: 36px;
+  font-size: 0.95em;
+}

@@ -1,0 +1,7 @@
+#!/bin/sh
+# Keep read.html (the plain, readable page) in step with the shop scrolls in home.html.
+# Enabled with: git config core.hooksPath tools/hooks
+if git diff --cached --name-only | grep -qx 'home.html'; then
+  python3 tools/sync_read.py || exit 1
+  git add read.html
+fi

@@ -903,9 +903,13 @@
     scroll.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'start' });
   }
 
-  // For visitors who'd rather not play: every scroll in every shop, all at once.
+  // For visitors who'd rather not play: every scroll in every shop, all at once,
+  // then a second press opens the plain, readable page (read.html).
   var magickBtn = document.getElementById('btnMagick');
+  var magicked = false;
   function magickAll() {
+    if (magicked) { window.location.href = 'read.html'; return; }
+    magicked = true;
     pages.forEach(function (page) {
       if (!SHOPS[page.id]) return;
       scrollsOf(page).forEach(function (_, i) { owned[scrollKey(page, i)] = true; });
@@ -913,10 +917,9 @@
     });
     gold = 0;
     updatePurse();
-    magickBtn.disabled = true;
-    magickBtn.textContent = '✦ Every scroll is yours ✦';
+    magickBtn.textContent = '✦ Press here to read all scrolls ✦';
     magickBtn.classList.add('cast');
-    statusEl.textContent = 'Poof! Every scroll is yours. Step into any shop to read them.';
+    statusEl.textContent = 'Poof! Every scroll is yours. Read them all at once, or step into any shop.';
   }
 
   // Space or Enter with nothing focused buys the next scroll on the shelf.
