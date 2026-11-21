@@ -155,82 +155,54 @@ kbd.space {
   font-family: "Lower Pixel", "Latin Modern", "Times New Roman", serif;
 }
 
-.scenery {
-  fill: none;
-  stroke: #000;
-  stroke-opacity: 0.55; /* faded outlines; fills below stay full colour */
-  stroke-width: 1.5;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-}
-
-.scenery .trees path { fill: #d9efcf; } /* pale green */
-.scenery .clouds     { fill: #ececec; } /* light grey */
-.scenery .sun        { stroke: #ffc21a; stroke-opacity: 1; stroke-width: 2.5; } /* yellow rays */
-.scenery .sun circle { fill: #ffc21a; } /* warm yellow */
-
-/* Medieval town */
-.scenery .stone   { fill: #eeebe4; } /* pale stone */
-.scenery .plaster { fill: #faf6ee; } /* whitewashed walls */
-.scenery .roof    { fill: #f0cdbd; } /* pale clay tiles */
-.scenery .slate   { fill: #dde2ea; } /* pale slate */
-.scenery .window  { fill: #fff; }
-.scenery .door    { fill: #e9e2d6; }
-.scenery .flag    { fill: #ff8c1a; stroke: #000; } /* same orange as the sun */
-.scenery .trees circle { fill: #d9efcf; }
-.scenery .street  { fill: #f2efe9; stroke: none; } /* cobbled street */
-.scenery .cobbles { stroke-opacity: 0.25; }
-
-/* Far layer of the city sits back in the haze */
-.scenery .far { opacity: 0.5; }
-
+/* The winding street. Colours live in the SVG itself (generated art); only behaviour is styled here. */
 .trail path {
   fill: none;
-  stroke: #000;
-  stroke-opacity: 0.35;
-  stroke-width: 3;
+  stroke: #fff;
+  stroke-opacity: 0.55;
+  stroke-width: 2.5;
   stroke-linecap: round;
-  stroke-dasharray: 0 14;
+  stroke-dasharray: 0 12;
 }
 
 .checkpoint {
   cursor: pointer;
 }
 
-/* Storefronts use the city's colours; the one you're at (or hovering) gets a firmer outline */
-/* Storefronts stand out from the townhouses: crisp outlines, stronger colour */
-.checkpoint .shop {
-  stroke-opacity: 0.9;
-  stroke-width: 1.8;
-  transition: stroke-width 0.2s ease;
+/* The windmill's sails turn slowly */
+.sails {
+  animation: sails 14s linear infinite;
 }
 
-.checkpoint .shop .roof  { fill: #e9a88f; } /* richer clay awnings */
-.checkpoint .shop .slate { fill: #a9bad6; } /* richer slate-blue awnings */
-.checkpoint .shop .window { fill: #fff6d6; } /* warm, lit shop windows */
+@keyframes sails {
+  to { transform: rotate(360deg); }
+}
 
-/* Townhouses behind the shops step back a little */
-.scenery .near { opacity: 0.78; }
+.checkpoint .hit {
+  fill: transparent;
+}
 
 .checkpoint .shop .door {
-  fill: #faf6ee; /* near-white, so zooming through it fades into the page */
+  fill: #f4ecdc; /* lit interior, the same colour as the shop pages, so zooming through it lands inside */
+}
+
+.checkpoint .shop {
+  transition: filter 0.2s ease;
 }
 
 .checkpoint:hover .shop,
 .checkpoint.here .shop {
-  stroke-opacity: 1;
-  stroke-width: 2.4;
+  filter: brightness(1.06) drop-shadow(0 0 6px rgba(255, 214, 120, 0.9));
 }
 
 .checkpoint .label {
-  font-size: 20px;
+  font-size: 18px;
   text-anchor: middle;
-}
-
-.checkpoint .sign {
-  font-size: 13px;
-  letter-spacing: 0.08em;
-  text-anchor: middle;
+  fill: #2b2118;
+  paint-order: stroke;
+  stroke: #fffaf0;
+  stroke-width: 4px;
+  stroke-linejoin: round;
 }
 
 .checkpoint:hover .label,
@@ -897,6 +869,7 @@ body:has(> .page:not([hidden])) {
     animation: none;
   }
   .walker.idle .walker-body,
+  .sails,
   .pet-pop,
   .resident,
   .scroll.unrolling,

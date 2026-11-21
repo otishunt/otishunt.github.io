@@ -109,12 +109,33 @@
   var walked = 0;
   var pets = [];         // in the order they joined
 
+  // A point `d` along the whole street (all segments end to end). Before the start it carries
+  // on in a straight line, off the bottom of the map where the street comes in.
+  function routePoint(d) {
+    if (d < 0) {
+      var a = segments[0].getPointAtLength(0), b = segments[0].getPointAtLength(2);
+      var len = Math.hypot(b.x - a.x, b.y - a.y) || 1;
+      return { x: a.x + (a.x - b.x) / len * -d, y: a.y + (a.y - b.y) / len * -d };
+    }
+    for (var i = 0; i < segments.length; i++) {
+      var l = segments[i].getTotalLength();
+      if (d <= l || i === segments.length - 1) return segments[i].getPointAtLength(Math.min(d, l));
+      d -= l;
+    }
+  }
+
   function resetTrail(p) {
-    // Pretend the wizard just walked in from the side with more room, so pets line up behind.
-    var dir = p.x > 300 ? -1 : 1;
+    // Line the pets up behind the wizard along the street he came up.
+    var at = 0;
+    for (var i = 0; i < current; i++) at += segments[i].getTotalLength();
     var back = PET_SPACING * 5;
-    trail = [{ x: p.x + dir * back, y: p.y, d: 0 }, { x: p.x, y: p.y, d: back }];
-    walked = back;
+    trail = [];
+    for (var d = 0; d <= back; d += 4) {
+      var q = routePoint(at - back + d);
+      trail.push({ x: q.x, y: q.y, d: d });
+    }
+    trail.push({ x: p.x, y: p.y, d: back + 0.01 });
+    walked = back + 0.01;
   }
 
   function record(p) {
@@ -210,7 +231,7 @@
       art.innerHTML = PETS[node].art;
       place.appendChild(art);
       wrap.appendChild(place);
-      cp.insertBefore(wrap, cp.querySelector('.label'));
+      win.parentNode.insertBefore(wrap, win.nextSibling); // inside the (scaled) shop drawing
       residents[node] = wrap;
     });
   }
@@ -714,13 +735,14 @@
     }
 
     switch (e.key) {
+      // The street climbs from bottom-left to top-right: Right/Up go forward, Left/Down go back.
       case 'ArrowRight':
-      case 'ArrowDown':
+      case 'ArrowUp':
         e.preventDefault();
         nudge(1);
         break;
       case 'ArrowLeft':
-      case 'ArrowUp':
+      case 'ArrowDown':
         e.preventDefault();
         nudge(-1);
         break;
