@@ -390,10 +390,6 @@ figcaption {
   min-height: 1.5em;
 }
 
-.fig {
-  margin-right: 0.3em;
-}
-
 .controls {
   display: flex;
   justify-content: center;
