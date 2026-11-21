@@ -4,8 +4,8 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Otis Hunt</title>
-  <link rel="stylesheet" href="css/fonts.css?v=20261121g">
-  <link rel="stylesheet" href="css/home.css?v=20261121g">
+  <link rel="stylesheet" href="css/fonts.css?v=20261121h">
+  <link rel="stylesheet" href="css/home.css?v=20261121h">
   <script>
     // Coming from the cover's dive into the wizard: start inside his robe (see arrive() in home.js).
     try {
@@ -18,9 +18,11 @@
 </head>
 <body>
   <main class="world" id="world">
-    <p class="magick-row">
-      <button type="button" id="btnMagick" class="magick">✦ Magick all scrolls into your possession ✦</button>
-    </p>
+    <div class="start-menu" id="startMenu" role="group" aria-labelledby="startQ">
+      <p class="start-q" id="startQ">Welcome, traveller! How shall we proceed?</p>
+      <a class="magick" id="btnSkip" href="read.html">✦ Skip the quest ✦</a>
+      <button type="button" class="play" id="btnPlay">Play the quest →</button>
+    </div>
 
     <header class="title">
       <h1>Otis Hunt</h1>
@@ -1750,6 +1752,6 @@
     </div>
   </section>
 
-  <script src="js/home.js?v=20261121g"></script>
+  <script src="js/home.js?v=20261121h"></script>
 </body>
 </html>

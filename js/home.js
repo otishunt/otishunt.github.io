@@ -90,6 +90,9 @@
   var scroller = document.getElementById('mapScroll');
   var svg = document.getElementById('map');
   var cam = { s: 1, padTop: 0, padBottom: 0 };
+  // The start menu hangs over the Start, just above the wizard's hat when he's standing there.
+  var startMenu = document.getElementById('startMenu');
+  var START_SIGN = { x: 60, y: 404 };
   var lastSpot = null;
 
   function clamp(v, lo, hi) { return Math.max(lo, Math.min(hi, v)); }
@@ -101,7 +104,7 @@
     if (!vw || !vh) return;
     var sr = scroller.getBoundingClientRect();
     var top = sr.top, bottom = sr.bottom;
-    ['.title', '.magick-row'].forEach(function (sel) { top = Math.max(top, world.querySelector(sel).getBoundingClientRect().bottom); });
+    top = Math.max(top, world.querySelector('.title').getBoundingClientRect().bottom);
     ['figcaption', '.controls'].forEach(function (sel) { bottom = Math.min(bottom, world.querySelector(sel).getBoundingClientRect().top); });
     cam.padTop = top - sr.top + 8;
     cam.padBottom = sr.bottom - bottom + 8;
@@ -126,6 +129,11 @@
     var tx = vw / 2 - (cx - WORLD.x) * s;
     var ty = cam.padTop + bandH / 2 - (cy - WORLD.y) * s;
     svg.style.transform = 'translate(' + tx.toFixed(1) + 'px, ' + ty.toFixed(1) + 'px)';
+
+    var half = startMenu.offsetWidth / 2;
+    var sx = clamp(tx + (START_SIGN.x - WORLD.x) * s, half + 8, Math.max(half + 8, vw - half - 8));
+    startMenu.style.left = sx.toFixed(1) + 'px';
+    startMenu.style.top = (ty + (START_SIGN.y - WORLD.y) * s).toFixed(1) + 'px';
   }
 
   window.addEventListener('resize', function () {
@@ -298,14 +306,39 @@
     walker.classList.toggle('idle', idle);
   }
 
+  // Show or hide the start menu. Hidden, it's also inert (nothing in it can be focused or clicked) and
+  // gives up focus, so a button you clicked there can't quietly swallow Space later on.
+  function showStartMenu(show) {
+    startMenu.classList.toggle('away', !show);
+    startMenu.inert = !show;
+    if (!show && startMenu.contains(document.activeElement)) document.activeElement.blur();
+  }
+
+  // Drop focus left on anything that's no longer on screen (e.g. after coming back with Back).
+  function dropStrayFocus() {
+    var el = document.activeElement;
+    if (el && el !== document.body && el.closest && el.closest('[inert], [hidden], .away')) el.blur();
+  }
+
+  // Does a key belong to the focused element rather than to the map or shop? Only real, visible
+  // buttons handle Space; links only handle Enter. Anything hidden or inert doesn't count.
+  function ownsKey(el, key) {
+    if (!el || !el.closest || el.closest('[inert], [hidden], .away')) return false;
+    if (el.tagName === 'BUTTON') return key === ' ' || key === 'Enter';
+    if (el.tagName === 'A') return key === 'Enter';
+    return false;
+  }
+
   // ── Status line + highlight ───────────────────────────────────
   function updateStatus() {
     checkpoints.forEach(function (cp, i) {
       cp.classList.toggle('here', !moving && i === current);
     });
+    // The start menu only shows while the wizard is standing at the Start.
+    showStartMenu(!moving && current === 0);
     if (moving) return;
     if (current === 0) {
-      statusEl.textContent = 'Use → to walk to the first checkpoint, or tap one on the map.';
+      statusEl.textContent = 'Walk → to play the quest, or press Space to skip it.';
     } else {
       statusEl.textContent = NODES[current].name + ': press Space (or tap it again) to go inside.';
     }
@@ -384,7 +417,7 @@
     if (moving || entering) return;
     var node = NODES[current];
     if (!node.section) {
-      statusEl.textContent = 'Nothing to go into here. Walk → to the first checkpoint.';
+      window.location.href = 'read.html'; // at the Start, Space skips the quest
       return;
     }
     entering = true;
@@ -453,6 +486,7 @@
       pages.forEach(function (p) { p.hidden = true; });
       world.hidden = false;
       layout();
+      dropStrayFocus();
       resetMap();
       updateStatus();
       if (lastShop !== null) {
@@ -948,25 +982,6 @@
     scroll.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'start' });
   }
 
-  // For visitors who'd rather not play: every scroll in every shop, all at once,
-  // then a second press opens the plain, readable page (read.html).
-  var magickBtn = document.getElementById('btnMagick');
-  var magicked = false;
-  function magickAll() {
-    if (magicked) { window.location.href = 'read.html'; return; }
-    magicked = true;
-    pages.forEach(function (page) {
-      if (!SHOPS[page.id]) return;
-      scrollsOf(page).forEach(function (_, i) { owned[scrollKey(page, i)] = true; });
-      refreshShop(page);
-    });
-    gold = 0;
-    updatePurse();
-    magickBtn.textContent = '✦ Press here to read all scrolls ✦';
-    magickBtn.classList.add('cast');
-    statusEl.textContent = 'Poof! Every scroll is yours. Read them all at once, or step into any shop.';
-  }
-
   // Space or Enter with nothing focused buys the next scroll on the shelf.
   function buyNext(page) {
     var buttons = page.querySelectorAll('.buy');
@@ -1010,8 +1025,7 @@
   // ── Input ──────────────────────────────────────────────────────
   document.addEventListener('keydown', function (e) {
     if (arriving) return; // still zooming out of the robe
-    var tag = e.target.tagName;
-    var onControl = tag === 'BUTTON' || tag === 'A';
+    var onControl = ownsKey(e.target, e.key);
 
     // Inside a shop: Esc leaves, Space or Enter buys the scroll.
     if (world.hidden) {
@@ -1056,7 +1070,7 @@
   document.getElementById('btnPrev').addEventListener('click', function () { nudge(-1); });
   document.getElementById('btnNext').addEventListener('click', function () { nudge(1); });
   document.getElementById('btnEnter').addEventListener('click', enter);
-  magickBtn.addEventListener('click', magickAll);
+  document.getElementById('btnPlay').addEventListener('click', function () { nudge(1); });
 
   window.addEventListener('hashchange', route);
 
@@ -1113,7 +1127,7 @@
       world.style.transform = '';
       world.style.transformOrigin = '';
       root.style.background = '';
-      root.classList.remove('arriving', 'zoom-set'); // title, Magick button and controls fade in
+      root.classList.remove('arriving', 'zoom-set'); // title, start menu and controls fade in
       arriving = false;
       setIdle(true);
     }
