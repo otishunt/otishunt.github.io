@@ -547,7 +547,9 @@
     },
     contact: {
       keeper: 'postmaster', name: 'Postmaster Pell',
-      pitch: 'Want to send word to Otis? His addresses are sealed in this scroll. ' + SCROLL_PRICE + ' gold.'
+      pitch: 'Want to send word to Otis? His addresses are sealed in this scroll. ' + SCROLL_PRICE + ' gold.',
+      // first visit after buying this scroll at the guild (Experience's "Hiring?" button)
+      relayedLine: 'Ah, the guild sent word you\'d be by! You bought Otis\'s addresses from Guildmaster Rowan, so your scroll\'s right here. Send word anytime.'
     }
   };
   var THANKS = 'Pleasure doing business! Mind the ink, it is still wet.';
@@ -558,6 +560,7 @@
   // Purchases are not remembered: every visit starts with full gold and sealed scrolls.
   var gold = 0;
   var owned = {};           // "page-id:index" -> true
+  var relayed = {};         // shop id -> true once its scroll was bought in another shop and not yet mentioned
 
   function keeperArt(kind) {
     var skin = { archivist: '#f1cfae', tinker: '#c99a72', guildmaster: '#8d5b3a', postmaster: '#e8b98f' }[kind];
@@ -922,6 +925,7 @@
   function recruit(page) {
     var info = SHOPS[page.id];
     var other = document.getElementById(info.recruit);
+    relayed[other.id] = true;
     scrollsOf(other).forEach(function (scroll, i) {
       var key = scrollKey(other, i);
       if (!owned[key]) {
@@ -952,7 +956,12 @@
     if (!info) return;
     var total = scrollsOf(page).length;
     var left = remaining(page);
-    say(page, left === total ? info.pitch : left > 0 ? WELCOME_BACK_MORE : WELCOME_BACK);
+    if (relayed[page.id] && info.relayedLine) {
+      say(page, info.relayedLine); // bought elsewhere: the shopkeeper heard about it
+      relayed[page.id] = false;
+    } else {
+      say(page, left === total ? info.pitch : left > 0 ? WELCOME_BACK_MORE : WELCOME_BACK);
+    }
     Array.prototype.forEach.call(page.querySelectorAll('.scroll'), function (scroll) {
       scroll.classList.remove('unrolling', 'inking');
     });
