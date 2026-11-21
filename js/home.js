@@ -45,7 +45,6 @@
   };
 
   var world = document.getElementById('world');
-  var mapWrap = document.getElementById('mapWrap');
   var walker = document.getElementById('walker');
   var face = walker.querySelector('.walker-face');
   var legL = document.getElementById('legL');
@@ -97,7 +96,7 @@
   }
 
   function pose(distance) {
-    var s = moving ? Math.sin(distance / STEP_LENGTH) : 0;
+    var s = moving || entering ? Math.sin(distance / STEP_LENGTH) : 0;
     legL.setAttribute('x2', (-4 + 6 * s).toFixed(2));
     legR.setAttribute('x2', (4 - 6 * s).toFixed(2));
     armL.setAttribute('x2', (-9 - 3 * s).toFixed(2)); // the other hand holds the staff
@@ -352,44 +351,52 @@
     }
 
     setIdle(false);
-    walker.classList.add('entering');
     world.classList.add('leaving');
 
-    setTimeout(function () {
-      var door = checkpoints[current].querySelector('.door');
-      var doorRect = door.getBoundingClientRect();
-      var wrapRect = mapWrap.getBoundingClientRect();
-      var cx = doorRect.left + doorRect.width / 2 - wrapRect.left;
-      var cy = doorRect.top + doorRect.height * 0.6 - wrapRect.top;
-      var diagonal = Math.hypot(window.innerWidth, window.innerHeight);
-      var scale = (diagonal / doorRect.width) * 1.4;
+    // Walk up to the shop's doorway (the shop group is placed with its door at its origin)...
+    var from = nodePoint(current);
+    var m = checkpoints[current].transform.baseVal.consolidate().matrix;
+    var to = { x: m.e, y: m.f - 3 };
+    var len = Math.hypot(to.x - from.x, to.y - from.y);
+    var duration = Math.max(160, (len / SPEED) * 1000);
+    var start = null;
+    function step(now) {
+      if (start === null) start = now;
+      var t = Math.min((now - start) / duration, 1);
+      place({ x: from.x + (to.x - from.x) * t, y: from.y + (to.y - from.y) * t });
+      pose(t * len * 2.5);
+      if (t < 1) { requestAnimationFrame(step); return; }
+      pose(0);
+      // ...vanish into it, then fade the screen to white and open the shop.
+      walker.classList.add('entering');
+      setTimeout(function () {
+        veil.classList.add('on');
+        setTimeout(function () { location.hash = node.section; }, VEIL_MS);
+      }, 160);
+    }
+    requestAnimationFrame(step);
+  }
 
-      mapWrap.style.transformOrigin = cx + 'px ' + cy + 'px';
-      mapWrap.getBoundingClientRect(); // commit origin before animating
-      mapWrap.classList.add('zooming');
-      mapWrap.style.transform = 'scale(' + scale + ')';
+  // A full-screen white veil for going in and out of shops.
+  var VEIL_MS = 180;
+  var veil = document.createElement('div');
+  veil.className = 'veil';
+  veil.setAttribute('aria-hidden', 'true');
+  document.body.appendChild(veil);
 
-      var finished = false;
-      function finish() {
-        if (finished) return;
-        finished = true;
-        location.hash = node.section;
-      }
-      mapWrap.addEventListener('transitionend', function handler(ev) {
-        if (ev.target !== mapWrap || ev.propertyName !== 'transform') return;
-        mapWrap.removeEventListener('transitionend', handler);
-        finish();
-      });
-      setTimeout(finish, 1600);
-    }, 550);
+  function liftVeil() {
+    if (!veil.classList.contains('on')) return;
+    requestAnimationFrame(function () {
+      requestAnimationFrame(function () { veil.classList.remove('on'); });
+    });
   }
 
   function resetMap() {
     entering = false;
-    mapWrap.classList.remove('zooming');
-    mapWrap.style.transform = '';
     world.classList.remove('leaving');
     walker.classList.remove('entering');
+    place(nodePoint(current)); // back out on the street, in front of the door
+    pose(0);
     setIdle(true);
   }
 
@@ -430,6 +437,7 @@
 
     world.hidden = true;
     pages.forEach(function (p) { p.hidden = p.id !== id; });
+    liftVeil(); // fade up from white into the shop
     window.scrollTo(0, 0);
     var page = document.getElementById(id);
     var heading = page.querySelector('h2');
@@ -453,7 +461,10 @@
     },
     experience: {
       keeper: 'guildmaster', name: 'Guildmaster Rowan',
-      pitch: 'Every quest Otis has taken on, recorded for the guild, one scroll per quest. ' + SCROLL_PRICE + ' gold apiece, traveller.'
+      pitch: 'Every quest Otis has taken on, recorded for the guild, one scroll per quest. ' + SCROLL_PRICE + ' gold apiece, traveller.',
+      // Recruiters can get Otis's contact scroll right here, without walking to the post office.
+      recruit: 'contact',
+      recruitLine: 'Hiring, are we? Here are Otis\'s addresses, fresh from the post office. Send word anytime.'
     },
     contact: {
       keeper: 'postmaster', name: 'Postmaster Pell',
@@ -711,8 +722,9 @@
     return a + '</svg>';
   }
 
+  // A shop's own scrolls (not copies of another shop's scroll, like the recruiter's contact scroll).
   function scrollsOf(page) {
-    return Array.prototype.slice.call(page.querySelectorAll('.scroll'));
+    return Array.prototype.slice.call(page.querySelectorAll('.scroll:not(.courier)'));
   }
 
   function scrollKey(page, i) {
@@ -759,6 +771,14 @@
         btn.addEventListener('click', function () { buy(page, i); });
         list.appendChild(btn);
       });
+
+      if (info.recruit) {
+        var row = document.createElement('p');
+        row.className = 'recruit-row';
+        row.innerHTML = '<button type="button" class="recruit"></button>';
+        shop.appendChild(row);
+        row.querySelector('button').addEventListener('click', function () { recruit(page); });
+      }
     });
     gold = total * SCROLL_PRICE;
     updatePurse();
@@ -806,6 +826,46 @@
     var left = remaining(page);
     page.querySelector('.shop-actions').hidden = left === 0;
     page.querySelector('.for-sale').style.display = left === 0 ? 'none' : '';
+
+    var info = SHOPS[page.id];
+    var row = page.querySelector('.recruit-row');
+    if (info && info.recruit && row) {
+      var other = document.getElementById(info.recruit);
+      var have = scrollsOf(other).every(function (_, i) { return owned[scrollKey(other, i)]; });
+      row.hidden = !!page.querySelector('.scroll.courier');
+      row.querySelector('button').textContent = have
+        ? 'Hiring? Read Otis\'s Contact scroll here'
+        : 'Hiring? Get Otis\'s Contact scroll here \u00B7 ' + SCROLL_PRICE + ' gold';
+    }
+  }
+
+  // Buy (if needed) another shop's scrolls and unroll copies of them here.
+  function recruit(page) {
+    var info = SHOPS[page.id];
+    var other = document.getElementById(info.recruit);
+    scrollsOf(other).forEach(function (scroll, i) {
+      var key = scrollKey(other, i);
+      if (!owned[key]) {
+        owned[key] = true;
+        gold = Math.max(0, gold - SCROLL_PRICE);
+      }
+      var copy = scroll.cloneNode(true);
+      copy.classList.remove('sealed', 'unrolling', 'inking');
+      copy.classList.add('courier');
+      var h = copy.querySelector('h2');
+      if (h) h.setAttribute('tabindex', '-1');
+      page.appendChild(copy);
+      if (!reduceMotion) copy.classList.add('unrolling');
+      inkIn(copy, 0.7);
+      if (i === 0) {
+        (h || copy).focus({ preventScroll: true });
+        copy.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'start' });
+      }
+    });
+    updatePurse();
+    refreshShop(other);
+    refreshShop(page);
+    say(page, info.recruitLine);
   }
 
   function openShop(page) {
@@ -814,7 +874,7 @@
     var total = scrollsOf(page).length;
     var left = remaining(page);
     say(page, left === total ? info.pitch : left > 0 ? WELCOME_BACK_MORE : WELCOME_BACK);
-    scrollsOf(page).forEach(function (scroll) {
+    Array.prototype.forEach.call(page.querySelectorAll('.scroll'), function (scroll) {
       scroll.classList.remove('unrolling', 'inking');
     });
     refreshShop(page);
@@ -841,6 +901,22 @@
     var next = page.querySelector('.buy:not([hidden])');
     (next || scroll.querySelector('h2')).focus({ preventScroll: true });
     scroll.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'start' });
+  }
+
+  // For visitors who'd rather not play: every scroll in every shop, all at once.
+  var magickBtn = document.getElementById('btnMagick');
+  function magickAll() {
+    pages.forEach(function (page) {
+      if (!SHOPS[page.id]) return;
+      scrollsOf(page).forEach(function (_, i) { owned[scrollKey(page, i)] = true; });
+      refreshShop(page);
+    });
+    gold = 0;
+    updatePurse();
+    magickBtn.disabled = true;
+    magickBtn.textContent = '✦ Every scroll is yours ✦';
+    magickBtn.classList.add('cast');
+    statusEl.textContent = 'Poof! Every scroll is yours. Step into any shop to read them.';
   }
 
   // Space or Enter with nothing focused buys the next scroll on the shelf.
@@ -932,6 +1008,7 @@
   document.getElementById('btnPrev').addEventListener('click', function () { nudge(-1); });
   document.getElementById('btnNext').addEventListener('click', function () { nudge(1); });
   document.getElementById('btnEnter').addEventListener('click', enter);
+  magickBtn.addEventListener('click', magickAll);
 
   window.addEventListener('hashchange', route);
 

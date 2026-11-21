@@ -114,8 +114,8 @@ bridge = road.intersection(stream.buffer(7))
 water_vis = water.difference(road)
 
 # ── Castle path: a dirt track from the castle gate down to the street ──
-CASTLE_AT = (175, 200)   # front-centre of the castle wall (gate)
-castle_path_line = LineString(sample([((175, 200), (175, 270), (120, 330), (125, 460))], 40))
+CASTLE_AT = (175, 214)   # front-centre of the castle wall (gate)
+castle_path_line = LineString(sample([((175, 232), (175, 290), (120, 336), (125, 460))], 40))
 castle_path = castle_path_line.buffer(8, 12).difference(road)
 
 # ── Paint helpers ──
@@ -275,33 +275,90 @@ for node, *_ in SHOPS:
 
 # ── Castle on the hill (top-left), windmill and fields (top-middle) ──
 def castle():
+    """A fortress seen from the front and a little above: high walls and a keep hide the yard."""
     x, y = CASTLE_AT
     o = ['<g transform="translate(%s %s)">' % (f(x), f(y))]
-    o.append(shadow_rect(-112, -132, 112, 0))
-    # courtyard and walls seen from above
-    o.append('<path d="M-100 -118 H100 V-44 H-100 Z" fill="#8fb37a" stroke="%s" stroke-width="1.2"/>' % INK)
-    o.append('<path d="M-100 -124 H100 V-116 H-100 Z M-100 -124 H-92 V-44 H-100 Z M92 -124 H100 V-44 H92 Z" fill="#d8d0c4" stroke="%s" stroke-width="1.1"/>' % INK)
-    # keep in the courtyard
-    o.append('<g transform="translate(0 -60)">' + shadow_rect(-34, -62, 34, 0) +
-             '<rect x="-30" y="-26" width="60" height="26" fill="#d9d1c6" stroke="%s" stroke-width="1.2"/>' % INK +
-             window(-20, -20, 8, 12, True) + window(12, -20, 8, 12, True) +
-             roof_block(-34, 34, -62, -26, '#7d5a7a') +
-             '<path d="M0 -69 V-86 l12 4 l-12 4" fill="#c0504a" stroke="%s" stroke-width="1"/></g>' % INK)
-    # front wall with gate and crenellations
-    o.append('<rect x="-100" y="-44" width="200" height="40" fill="#cfc6b8" stroke="%s" stroke-width="1.3"/>' % INK)
-    o.append('<path d="M-100 -50 H100 V-44 H-100 Z" fill="#e2dbcf" stroke="%s" stroke-width="1.1"/>' % INK)
-    o.append('<path d="%s" fill="#cfc6b8" stroke="%s" stroke-width="1"/>' % (' '.join('M%s -56 h7 v6 h-7 Z' % f(-98 + k * 14) for k in range(15)), INK))
-    o.append('<path d="M-100 -26 H100 M-100 -14 H100" stroke="%s" stroke-opacity=".18" stroke-width="1"/>' % INK)
-    o.append('<path d="M-15 -4 V-28 a15 15 0 0 1 30 0 V-4 Z" fill="#3d3230" stroke="%s" stroke-width="1.3"/>' % INK)
-    o.append('<path d="M-10 -4 V-30 M-5 -4 V-35 M0 -4 V-36 M5 -4 V-35 M10 -4 V-30 M-14 -12 H14 M-14 -22 H14" stroke="#8a8078" stroke-width="1.2"/>')
-    # corner towers
-    for tx in (-100, 100):
-        o.append('<g transform="translate(%s -4)">' % f(tx) +
-                 '<rect x="-15" y="-52" width="30" height="52" fill="#d3cabd" stroke="%s" stroke-width="1.3"/>' % INK +
-                 '<rect x="-4" y="-38" width="7" height="10" fill="#ffd98a" stroke="%s" stroke-width="1"/>' % INK +
-                 '<path d="M-19 -52 L0 -86 L19 -52 Z" fill="#8a5f6e" stroke="%s" stroke-width="1.2"/>' % INK +
-                 '<path d="M0 -86 L19 -52 H6 Z" fill="#6e4a58"/>' +
-                 '<path d="M0 -86 V-100 l11 4 l-11 4" fill="#c0504a" stroke="%s" stroke-width="1"/></g>' % INK)
+
+    def merlons(x0, x1, top, h=7, w=7, gap=6, fill='#d8cfc1'):
+        d, k = [], x0
+        while k + w <= x1 + 0.1:
+            d.append('M%s %s h%s v%s h-%s Z' % (f(k), f(top - h), f(w), f(h), f(w)))
+            k += w + gap
+        return '<path d="%s" fill="%s" stroke="%s" stroke-width="1"/>' % (' '.join(d), fill, INK)
+
+    def round_tower(cx, base, top, r, roof, flag=True, lit=True):
+        t = []
+        t.append('<path d="M%s %s V%s H%s V%s Z" fill="url(#towerShade)" stroke="%s" stroke-width="1.3"/>'
+                 % (f(cx - r), f(base), f(top), f(cx + r), f(base), INK))
+        t.append('<path d="M%s %s V%s H%s V%s Z" fill="url(#bricks)" opacity=".7"/>' % (f(cx - r), f(base), f(top), f(cx + r), f(base)))
+        if lit:
+            t.append('<path d="M%s %s v-12 a3 3 0 0 1 6 0 v12 Z" fill="#ffd98a" stroke="%s" stroke-width="1"/>' % (f(cx - 3), f(top + 26), INK))
+        t.append('<path d="M%s %s v10 M%s %s v10" stroke="%s" stroke-width="2.2" stroke-linecap="round"/>'
+                 % (f(cx - r * .45), f(base - 34), f(cx + r * .45), f(base - 34), '#3d3230'))
+        # conical roof with its shaded side
+        t.append('<path d="M%s %s L%s %s L%s %s Z" fill="%s" stroke="%s" stroke-width="1.3"/>'
+                 % (f(cx - r - 5), f(top), f(cx), f(top - r * 2.3), f(cx + r + 5), f(top), roof, INK))
+        t.append('<path d="M%s %s L%s %s L%s %s Z" fill="%s"/>' % (f(cx), f(top - r * 2.3), f(cx + r + 5), f(top), f(cx + r * .25), f(top), shade(roof, .72)))
+        t.append('<path d="M%s %s L%s %s L%s %s Z" fill="url(#tiles)" opacity=".7"/>' % (f(cx - r - 5), f(top), f(cx), f(top - r * 2.3), f(cx + r + 5), f(top)))
+        if flag:
+            ft = top - r * 2.3
+            t.append('<path d="M%s %s V%s" stroke="%s" stroke-width="1.4"/><path d="M%s %s q7 -3 13 1 q-6 3 -13 7 Z" fill="#c0504a" stroke="%s" stroke-width="1"/>'
+                     % (f(cx), f(ft), f(ft - 16), INK, f(cx), f(ft - 16), INK))
+        return ''.join(t)
+
+    o.append('<ellipse cx="10" cy="6" rx="130" ry="14" fill="#1f2a14" opacity=".22"/>')
+    # back towers and the keep, rising above the front wall (they hide the yard)
+    o.append(round_tower(-74, -60, -128, 13, '#5c4a6e', lit=False))
+    o.append(round_tower(74, -60, -128, 13, '#5c4a6e', lit=False))
+    # side halls along the inner walls
+    for hx0, hx1 in ((-98, -50), (50, 98)):
+        o.append('<rect x="%s" y="-86" width="%s" height="26" fill="#cbc1b1" stroke="%s" stroke-width="1.2"/>' % (f(hx0), f(hx1 - hx0), INK))
+        o.append(roof_block(hx0 - 3, hx1 + 3, -112, -86, '#7d4f6a', back=5))
+    # the keep
+    o.append('<rect x="-50" y="-112" width="100" height="52" fill="url(#keepShade)" stroke="%s" stroke-width="1.3"/>' % INK)
+    o.append('<rect x="-50" y="-112" width="100" height="52" fill="url(#bricks)" opacity=".6"/>')
+    for wx in (-38, -20, 14, 32):
+        o.append('<path d="M%s -82 v-12 a3.5 3.5 0 0 1 7 0 v12 Z" fill="#ffd98a" stroke="%s" stroke-width="1"/>' % (f(wx), INK))
+    o.append(merlons(-50, 50, -112))
+    # the great tower in the middle of the keep
+    o.append('<rect x="-20" y="-150" width="40" height="40" fill="url(#towerShade)" stroke="%s" stroke-width="1.3"/>' % INK)
+    o.append('<rect x="-20" y="-150" width="40" height="40" fill="url(#bricks)" opacity=".6"/>')
+    o.append('<path d="M-5 -122 v-14 a5 5 0 0 1 10 0 v14 Z" fill="#ffd98a" stroke="%s" stroke-width="1.1"/>' % INK)
+    o.append('<path d="M-25 -150 L0 -192 L25 -150 Z" fill="#6f4a78" stroke="%s" stroke-width="1.3"/>'
+             '<path d="M0 -192 L25 -150 H4 Z" fill="#553760"/>'
+             '<path d="M-25 -150 L0 -192 L25 -150 Z" fill="url(#tiles)" opacity=".7"/>' % INK)
+    o.append('<path d="M0 -192 V-210" stroke="%s" stroke-width="1.5"/><path d="M0 -210 q9 -4 17 1 q-8 4 -17 9 Z" fill="#ffc21a" stroke="%s" stroke-width="1"/>' % (INK, INK))
+    # the front curtain wall, with arrow slits and hanging banners
+    o.append('<rect x="-104" y="-60" width="208" height="60" fill="#cfc6b8" stroke="%s" stroke-width="1.4"/>' % INK)
+    o.append('<rect x="-104" y="-60" width="208" height="60" fill="url(#bricks)" opacity=".8"/>')
+    o.append('<path d="M-104 -60 H104 V-56 H-104 Z" fill="#e2dbcf"/>')
+    o.append(merlons(-104, 104, -60))
+    o.append('<path d="M-84 -36 v12 M-62 -36 v12 M62 -36 v12 M84 -36 v12" stroke="#3d3230" stroke-width="2.4" stroke-linecap="round"/>')
+    for bx in (-50, 50):
+        o.append('<path d="M%s -58 h18 v32 l-9 -6 l-9 6 Z" fill="#8f2a1c" stroke="%s" stroke-width="1.2"/>' % (f(bx - 9), INK) +
+                 '<path d="M%s -50 l2.4 5 l5.4 .7 l-4 3.8 l1 5.3 l-4.8 -2.6 l-4.8 2.6 l1 -5.3 l-4 -3.8 l5.4 -.7 Z" fill="#ffc21a"/>' % f(bx))
+    # gatehouse: two towers either side of the gate, with a portcullis
+    for gx in (-26, 26):
+        o.append('<path d="M%s 0 V-78 H%s V0 Z" fill="url(#towerShade)" stroke="%s" stroke-width="1.3"/>' % (f(gx - 12), f(gx + 12), INK))
+        o.append('<path d="M%s 0 V-78 H%s V0 Z" fill="url(#bricks)" opacity=".7"/>' % (f(gx - 12), f(gx + 12)))
+        o.append(merlons(gx - 12, gx + 12, -78, h=6, w=5, gap=4.5))
+        o.append('<path d="M%s -58 v10" stroke="#3d3230" stroke-width="2.4" stroke-linecap="round"/>' % f(gx))
+    o.append('<path d="M-14 0 V-30 a14 14 0 0 1 28 0 V0 Z" fill="#2b2220" stroke="%s" stroke-width="1.4"/>' % INK)
+    o.append('<path d="M-9 0 V-36 M-4.5 0 V-41 M0 0 V-43 M4.5 0 V-41 M9 0 V-36 M-14 -9 H14 M-14 -19 H14 M-13 -29 H13" stroke="#8a8078" stroke-width="1.4"/>')
+    o.append('<path d="M-18 -30 a18 18 0 0 1 36 0" fill="none" stroke="#a89e8e" stroke-width="3"/>')
+    # torches by the gate
+    for tx in (-19, 19):
+        o.append('<circle cx="%s" cy="-40" r="10" fill="url(#lampGlow)"/><path d="M%s -34 v-6" stroke="#5b3a26" stroke-width="2"/>'
+                 '<path d="M%s -40 q-3 -4 0 -9 q3 5 0 9 Z" fill="#ffb03a"/>' % (f(tx), f(tx), f(tx)))
+    # front corner towers, tallest of all
+    o.append(round_tower(-104, 2, -92, 17, '#6f4a78'))
+    o.append(round_tower(104, 2, -92, 17, '#6f4a78'))
+    # moat and drawbridge
+    o.append('<path d="M-128 4 H128 V16 H-128 Z" fill="#7fb6d6" stroke="#5f8fae" stroke-width="1.5"/>')
+    o.append('<path d="M-110 10 h14 M-60 9 h12 M40 10 h14 M90 9 h12" stroke="#d6ecf7" stroke-width="1.5" stroke-linecap="round"/>')
+    o.append('<path d="M-14 0 h28 v20 h-28 Z" fill="#a8743d" stroke="#5b3a26" stroke-width="1.4"/>'
+             '<path d="M-14 5 h28 M-14 10 h28 M-14 15 h28" stroke="#6b4a2c" stroke-width="1"/>'
+             '<path d="M-14 0 L-20 -26 M14 0 L20 -26" stroke="#3d3230" stroke-width="1.2"/>')
     o.append('</g>')
     return ''.join(o)
 
@@ -343,7 +400,7 @@ def fields():
     return ''.join(o)
 
 fields_area = unary_union([box(x - 6, y - 6, x + w + 6, y + h + 8) for x, y, w, h, _, _ in FIELDS] + [box(320, 30, 490, 172)])
-castle_area = box(CASTLE_AT[0] - 125, CASTLE_AT[1] - 210, CASTLE_AT[0] + 125, CASTLE_AT[1] + 10)
+castle_area = box(CASTLE_AT[0] - 138, CASTLE_AT[1] - 230, CASTLE_AT[0] + 138, CASTLE_AT[1] + 22)
 mill_area = box(MILL_AT[0] - 50, MILL_AT[1] - 112, MILL_AT[0] + 50, MILL_AT[1] + 10)
 start_zone = box(-10, 440, 160, 540)
 
@@ -445,6 +502,15 @@ DEFS = '''<defs>
     <path d="M0 6 a4 4 0 0 1 8 0 M-4 3 a4 4 0 0 1 8 0 M4 3 a4 4 0 0 1 8 0" fill="none" stroke="#3b2c22" stroke-opacity=".4" stroke-width=".9"/>
   </pattern>
   %s
+  <linearGradient id="towerShade" x1="0" y1="0" x2="1" y2="0">
+    <stop offset="0" stop-color="#e6ded2"/><stop offset=".45" stop-color="#d3cabd"/><stop offset="1" stop-color="#a99f90"/>
+  </linearGradient>
+  <linearGradient id="keepShade" x1="0" y1="0" x2="1" y2="0">
+    <stop offset="0" stop-color="#d9d0c3"/><stop offset="1" stop-color="#b9af9f"/>
+  </linearGradient>
+  <pattern id="bricks" width="16" height="8" patternUnits="userSpaceOnUse">
+    <path d="M0 0 H16 M0 4 H16 M4 0 V4 M12 4 V8" fill="none" stroke="#7d7264" stroke-opacity=".35" stroke-width=".8"/>
+  </pattern>
   <radialGradient id="lampGlow"><stop offset="0" stop-color="#ffe9a0" stop-opacity=".85"/><stop offset="1" stop-color="#ffe9a0" stop-opacity="0"/></radialGradient>
   <radialGradient id="vignette" cx=".5" cy=".5" r=".75"><stop offset=".6" stop-color="#1f2a14" stop-opacity="0"/><stop offset="1" stop-color="#1f2a14" stop-opacity=".22"/></radialGradient>
 </defs>''' % cobble_pattern()

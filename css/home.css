@@ -140,10 +140,6 @@ kbd.space {
   }
 }
 
-.map-wrap.zooming {
-  transition: transform 1.4s cubic-bezier(0.55, 0, 0.9, 0.35);
-}
-
 .map {
   display: block;
   width: 100%;
@@ -183,7 +179,7 @@ kbd.space {
 }
 
 .checkpoint .shop .door {
-  fill: #f4ecdc; /* lit interior, the same colour as the shop pages, so zooming through it lands inside */
+  fill: #f4ecdc; /* the shop's lit interior, seen through the open door */
 }
 
 .checkpoint .shop {
@@ -290,7 +286,7 @@ kbd.space {
 .walker-body {
   transform-box: fill-box;
   transform-origin: 50% 100%;
-  transition: transform 0.6s ease-in, opacity 0.6s ease-in;
+  transition: transform 0.2s ease-in, opacity 0.2s ease-in;
 }
 
 /* Arriving from the cover: start inside the wizard's robe and zoom out to the street */
@@ -316,20 +312,68 @@ html.arriving.zoom-set .world {
 html.arriving .key,
 html.arriving .title,
 html.arriving figcaption,
-html.arriving .controls {
+html.arriving .controls,
+html.arriving .magick-row {
   opacity: 0;
 }
 
-/* Hide everything but the map while zooming into a door */
+/* Hide everything but the map while walking into a shop */
 .title,
 figcaption,
-.controls {
+.controls,
+.magick-row {
   transition: opacity 0.4s ease;
+}
+
+/* "Magick all scrolls" for visitors who'd rather skip the game */
+.magick-row {
+  margin: 14px 0 0;
+  text-align: center;
+}
+
+.magick {
+  min-height: 40px;
+  padding: 0 16px;
+  font: inherit;
+  font-size: 15px;
+  color: #ffe9a0;
+  background: #4b3fa8; /* the wizard's robe */
+  border: 1.5px solid #000;
+  box-shadow: 3px 3px 0 #000;
+  cursor: pointer;
+}
+
+.magick:hover {
+  background: #5a4dc0;
+}
+
+.magick:active {
+  transform: translate(2px, 2px);
+  box-shadow: 1px 1px 0 #000;
+}
+
+.magick:focus-visible {
+  outline: 2px solid #000;
+  outline-offset: 3px;
+}
+
+.magick:disabled {
+  cursor: default;
+}
+
+.magick.cast {
+  animation: magick 0.7s ease-out;
+}
+
+@keyframes magick {
+  0%   { box-shadow: 3px 3px 0 #000, 0 0 0 0 rgba(255, 214, 120, 0.9); }
+  100% { box-shadow: 3px 3px 0 #000, 0 0 0 22px rgba(255, 214, 120, 0); }
 }
 
 .world.leaving .title,
 .world.leaving figcaption,
-.world.leaving .controls {
+.world.leaving .controls,
+.world.leaving .magick-row {
   opacity: 0;
 }
 
@@ -346,6 +390,21 @@ figcaption,
 @keyframes bob {
   0%, 100% { transform: translateY(0); }
   50%      { transform: translateY(-2px); }
+}
+
+/* Going into a shop: fade the whole screen to white, then lift it inside */
+.veil {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  background: #fff;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.18s ease;
+}
+
+.veil.on {
+  opacity: 1;
 }
 
 /* Walking in: shrink into the doorway */
@@ -636,6 +695,40 @@ body:has(> .page:not([hidden])) {
 .shop-art .k-letter    { fill: #fff; }
 .shop-art .k-quill     { fill: #fff; }
 
+/* In the Experience shop: a shortcut for recruiters to Otis's contact scroll */
+.recruit-row {
+  margin: 14px 0 0;
+}
+
+.recruit-row[hidden] {
+  display: none;
+}
+
+.recruit {
+  min-height: 44px;
+  padding: 0 18px;
+  font: inherit;
+  color: #fff;
+  background: #4c8a5e; /* the guild's green */
+  border: 1.5px solid #000;
+  box-shadow: 3px 3px 0 #000;
+  cursor: pointer;
+}
+
+.recruit:hover {
+  background: #5a9c6c;
+}
+
+.recruit:active {
+  transform: translate(2px, 2px);
+  box-shadow: 1px 1px 0 #000;
+}
+
+.recruit:focus-visible {
+  outline: 2px solid #000;
+  outline-offset: 4px;
+}
+
 /* A scroll you haven't bought yet stays on the counter */
 .scroll.sealed {
   display: none;
@@ -901,6 +994,7 @@ body:has(> .page:not([hidden])) {
   }
   .walker.idle .walker-body,
   .sails,
+  .magick.cast,
   .pet-pop,
   .resident,
   .scroll.unrolling,
@@ -908,7 +1002,7 @@ body:has(> .page:not([hidden])) {
     animation: none;
   }
   .walker-body,
-  .map-wrap.zooming {
+  .veil {
     transition: none;
   }
 }
