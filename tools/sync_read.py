@@ -23,6 +23,8 @@ VOID = {'area', 'base', 'br', 'col', 'embed', 'hr', 'img', 'input', 'link', 'met
 
 # Which shop sections appear, in what order, and under what heading.
 RESUME = 'Otis_Hunt_resume.pdf'   # linked in the header when the file is in the repo
+# Header-only links: not ways to get in touch, so they're not in the Contact scroll.
+HEADER_EXTRAS = [('https://github.com/otishunt', 'GitHub')]
 
 SECTIONS = [('about', 'About'), ('experience', 'Experience'), ('projects', 'Projects &amp; Research'), ('contact', 'Contact')]
 
@@ -201,6 +203,7 @@ def main():
 
     contacts = contact_items(scrolls('contact')[0])
     links = [(href, label) for label, href, _ in contacts if href]
+    links += [(href, label) for href, label in HEADER_EXTRAS if not any(h == href for h, _ in links)]
     # The resume isn't a way to get in touch, so it's not in the Contact scroll, but it belongs up top here.
     if os.path.exists(os.path.join(ROOT, RESUME)) and not any(href == RESUME for href, _ in links):
         links.append((RESUME, 'Resume (PDF)'))
