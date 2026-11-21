@@ -321,6 +321,33 @@ kbd.space {
   transition: transform 0.6s ease-in, opacity 0.6s ease-in;
 }
 
+/* Arriving from the cover: start inside the wizard's robe and zoom out to the street */
+html.arriving {
+  overflow: hidden;
+  background: #4b3fa8; /* the robe */
+}
+
+html.arriving body {
+  background: transparent;
+  animation: none;
+}
+
+html.arriving .world {
+  visibility: hidden; /* until home.js has zoomed it in */
+  pointer-events: none;
+}
+
+html.arriving.zoom-set .world {
+  visibility: visible;
+}
+
+html.arriving .key,
+html.arriving .title,
+html.arriving figcaption,
+html.arriving .controls {
+  opacity: 0;
+}
+
 /* Hide everything but the map while zooming into a door */
 .title,
 figcaption,
@@ -410,6 +437,12 @@ figcaption {
 
 .page[hidden] {
   display: none;
+}
+
+/* Inside a shop the white page becomes the shop's warm plaster wall */
+html:has(body > .page:not([hidden])),
+body:has(> .page:not([hidden])) {
+  background: #f4ecdc;
 }
 
 .back {
@@ -643,38 +676,66 @@ figcaption {
 /* The parchment, with a rolled rod at the top and bottom */
 .scroll {
   position: relative;
-  padding: 56px 56px 60px;
+  padding: 60px 56px 104px;
   color: var(--ink);
-  font-family: "IM Fell English", "Latin Modern", Georgia, serif;
+  font-family: "EB Garamond", "Latin Modern", Georgia, serif;
   font-size: 21px;
   line-height: 1.55;
+  font-variant-numeric: lining-nums;
   background:
+    /* wax seal pressed at the foot of the scroll */
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 60 60'%3E%3Cpath d='M30 3c5 0 7 3 11 4s8 1 10 5 0 8 2 12 4 7 2 11-6 5-8 9-2 9-6 11-8-1-11 0-6 4-11 3-6-5-10-7-9-3-10-7 2-8 1-12-5-8-3-12 7-4 10-7 4-8 8-10 8 1 15-2z' fill='%238f2a1c'/%3E%3Ccircle cx='30' cy='30' r='17' fill='none' stroke='%23651a10' stroke-width='2.5'/%3E%3Cpath d='M30 17l3.2 9.8L43 30l-9.8 3.2L30 43l-3.2-9.8L17 30l9.8-3.2z' fill='%23651a10'/%3E%3Cpath d='M18 14c4-3 9-4 13-3' fill='none' stroke='%23c2554a' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E")
+      center bottom 30px / 52px 52px no-repeat,
+    /* paper grain */
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.35 0 0 0 0 0.22 0 0 0 0 0.08 0 0 0 0.16 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"),
+    /* faint age stains */
+    radial-gradient(ellipse 30% 18% at 82% 30%, rgba(150, 100, 35, 0.1), transparent 70%),
+    radial-gradient(ellipse 22% 14% at 12% 70%, rgba(150, 100, 35, 0.09), transparent 70%),
     radial-gradient(ellipse at 20% 15%, rgba(255, 255, 255, 0.45), transparent 55%),
     radial-gradient(ellipse at 80% 85%, rgba(160, 110, 40, 0.18), transparent 60%),
     radial-gradient(ellipse at center, var(--parchment) 55%, var(--parchment-edge) 100%);
   box-shadow:
     inset 0 0 40px rgba(120, 80, 30, 0.35),
-    0 10px 24px rgba(60, 40, 15, 0.18);
+    inset 0 0 6px rgba(90, 55, 20, 0.35),
+    0 12px 28px rgba(60, 40, 15, 0.2);
 }
 
+/* Wooden rods, with a turned knob at each end */
 .scroll::before,
 .scroll::after {
   content: "";
   position: absolute;
-  left: -18px;
-  right: -18px;
-  height: 30px;
-  border-radius: 15px;
-  background: linear-gradient(to bottom, #6b4420 0%, #c48f54 35%, #e2b67c 50%, #a8743d 70%, #5e3a1a 100%);
-  box-shadow: 0 4px 8px rgba(40, 25, 10, 0.3);
+  left: -34px;
+  right: -34px;
+  height: 32px;
+  background:
+    radial-gradient(circle closest-side at 42% 40%, #f3d29a 0, #c48f54 40%, #7a4b22 78%, #3e250e 94%, transparent 100%)
+      left center / 32px 32px no-repeat,
+    radial-gradient(circle closest-side at 42% 40%, #f3d29a 0, #c48f54 40%, #7a4b22 78%, #3e250e 94%, transparent 100%)
+      right center / 32px 32px no-repeat,
+    /* dark collars where the knob meets the rod */
+    linear-gradient(#4a2c12, #4a2c12) left 28px center / 5px 24px no-repeat,
+    linear-gradient(#4a2c12, #4a2c12) right 28px center / 5px 24px no-repeat,
+    linear-gradient(to bottom, transparent 4px, #6b4420 4px, #c48f54 11px, #e9c48d 15px, #a8743d 21px, #5e3a1a 28px, transparent 28px)
+      center / calc(100% - 56px) 100% no-repeat;
+  filter: drop-shadow(0 4px 4px rgba(40, 25, 10, 0.3));
 }
 
-.scroll::before { top: -15px; }
-.scroll::after  { bottom: -15px; }
+.scroll::before { top: -16px; }
+.scroll::after  { bottom: -16px; }
+
+/* Without room beside the scroll, keep the knobs inside the 16px gutter */
+@media (max-width: 840px) {
+  .scroll::before,
+  .scroll::after {
+    left: -14px;
+    right: -14px;
+  }
+}
 
 .page h2 {
   margin: 0 0 20px;
-  font-family: "Uncial Antiqua", "Latin Modern", serif;
+  font-family: "IM Fell English", "Latin Modern", serif;
   font-weight: 400;
   font-size: 2.3rem;
   line-height: 1.15;
@@ -693,32 +754,95 @@ figcaption {
 }
 
 .page h3 {
-  margin: 30px 0 6px;
-  font-family: "Uncial Antiqua", "Latin Modern", serif;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin: 34px 0 8px;
+  font-family: "IM Fell English", "Latin Modern", serif;
   font-weight: 400;
   font-size: 1.35rem;
   color: var(--ink);
 }
 
+.page h3::before {
+  content: "\2767"; /* hedera leaf */
+  font-family: "IM Fell English", Georgia, serif;
+  color: var(--ink-red);
+  font-size: 0.95em;
+}
+
+.page h3::after {
+  /* an inked rule that fades out across the scroll */
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(to right, rgba(58, 37, 22, 0.55), transparent);
+}
+
 .page p {
   margin: 0 0 14px;
-  text-align: justify;
   hyphens: auto;
+}
+
+/* Labels are picked out in rubric red */
+.scroll strong {
+  font-weight: 600;
+  color: var(--ink-red);
 }
 
 .page a:not(.back) {
   color: var(--ink-red);
 }
 
-/* Illuminated drop cap on the opening paragraph */
-.scroll > h2 + p::first-letter,
+/* Role, place and dates under a heading */
+.page .meta {
+  margin: -6px 0 14px;
+  font-style: italic;
+  text-align: center;
+  hyphens: none;
+}
+
+.scroll h3 + .meta {
+  margin-top: 0;
+  text-align: left;
+}
+
+/* Bulleted lists in the scrolls */
+.scroll ul {
+  margin: 0 0 16px;
+  padding-left: 1.3em;
+}
+
+.scroll li {
+  margin-bottom: 8px;
+}
+
+.scroll li::marker {
+  color: var(--ink-red);
+}
+
+.scroll .contact-list {
+  clear: both; /* start below the drop cap */
+  list-style: none;
+  padding-left: 0;
+}
+
+.contact-list a {
+  overflow-wrap: anywhere;
+}
+
+/* Illuminated drop cap on the About intro (only a long paragraph can wrap around it) */
 .scroll > h2 + .about .about-text p:first-child::first-letter {
   float: left;
-  margin: 6px 8px 0 0;
+  margin: 5px 10px 0 0;
+  padding: 2px 9px 0;
   font-family: "IM Fell English", serif;
-  font-size: 3.6em;
-  line-height: 0.8;
+  font-size: 3em;
+  line-height: 1;
   color: var(--ink-red);
+  background: linear-gradient(135deg, #f7dc8f, #d9a93f);
+  border: 1.5px solid var(--ink-red);
+  box-shadow: 2px 2px 0 rgba(58, 37, 22, 0.25);
 }
 
 /* Ink appearing as if a wizard is writing it, one line of the scroll at a time */
@@ -757,13 +881,8 @@ figcaption {
 
 @media (max-width: 600px) {
   .scroll {
-    padding: 44px 24px 48px;
+    padding: 48px 24px 92px;
     font-size: 19px;
-  }
-  .scroll::before,
-  .scroll::after {
-    left: -8px;
-    right: -8px;
   }
   .about {
     flex-direction: column;

@@ -32,7 +32,7 @@
   font-display: swap;
 }
 
-/* Scroll pages — IM Fell English (Igino Marini) and Uncial Antiqua (Astigmatic), both SIL Open Font License */
+/* Scroll pages — IM Fell English (Igino Marini) for headings, EB Garamond (Georg Duffner) for text, both SIL Open Font License */
 @font-face {
   font-family: "IM Fell English";
   src: url("../fonts/IMFellEnglish-Regular.woff2") format("woff2");
@@ -50,9 +50,17 @@
 }
 
 @font-face {
-  font-family: "Uncial Antiqua";
-  src: url("../fonts/UncialAntiqua-Regular.woff2") format("woff2");
-  font-weight: 400;
+  font-family: "EB Garamond";
+  src: url("../fonts/EBGaramond.woff2") format("woff2");
+  font-weight: 400 800;
   font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "EB Garamond";
+  src: url("../fonts/EBGaramond-Italic.woff2") format("woff2");
+  font-weight: 400 800;
+  font-style: italic;
   font-display: swap;
 }

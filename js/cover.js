@@ -1,6 +1,13 @@
 (function () {
   var name = document.querySelector('.name');
   var key = document.querySelector('.letter.key');
+  var wiz = key.querySelector('.o-wizard');
+
+  // The wizard's drawing spans x -14..16 and y -64..2, feet at (0, 0).
+  var VB_X = -14, VB_Y = -64, VB_W = 30;
+  // A spot on the robe with at least 3.4 units of solid robe colour all around it.
+  var ROBE = { x: -4.4, y: -15, r: 3.4 };
+  var ROBE_COLOR = '#4b3fa8';
 
   // Any letter that isn't the O shows an arrow pointing left (toward the O).
   name.addEventListener('click', function (e) {
@@ -17,7 +24,7 @@
     letter.appendChild(hint);
   });
 
-  // Find the centre of the O's hole (in page coordinates) and its glyph width.
+  // Find the O's glyph box (in page coordinates).
   function measureO() {
     var keyRect = key.getBoundingClientRect();
     var style = getComputedStyle(key);
@@ -38,10 +45,28 @@
     var top = baseline - m.actualBoundingBoxAscent;
     var height = m.actualBoundingBoxAscent + m.actualBoundingBoxDescent;
 
-    return { x: left + width / 2, y: top + height / 2, width: width };
+    return { x: left + width / 2, bottom: top + height, fontSize: parseFloat(style.fontSize) };
   }
 
-  // The O zooms in slowly (flying through its hole), then goes to the home page.
+  // Stand the wizard on the inside of the O's bottom curve.
+  function placeWizard() {
+    var o = measureO();
+    var keyRect = key.getBoundingClientRect();
+    var unit = wiz.getBoundingClientRect().width / VB_W;
+    var feetX = o.x;                         // body centred, staff to his right
+    var feetY = o.bottom - o.fontSize * 0.03; // just above the O's thin bottom stroke
+    wiz.style.left = (feetX - keyRect.left + VB_X * unit) + 'px';
+    wiz.style.top = (feetY - keyRect.top + VB_Y * unit) + 'px';
+    wiz.classList.add('placed');
+  }
+
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(placeWizard);
+  else placeWizard();
+  window.addEventListener('resize', function () {
+    if (!zooming) placeWizard();
+  });
+
+  // Clicking the O dives into the wizard's robe; home.html then zooms back out of it.
   var zooming = false;
   key.addEventListener('click', function (e) {
     if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
@@ -53,34 +78,49 @@
     var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     if (reduce) { window.location.href = href; return; }
 
+    // Tell home.html to start inside the robe, with the wizard back at the start.
+    try {
+      sessionStorage.setItem('arriveZoom', '1');
+      sessionStorage.setItem('mapNode', '0');
+    } catch (err) {}
+
     // Freeze the O where it is (hover lift included) so it doesn't drop mid-zoom.
     key.style.transition = 'none';
     key.style.transform = getComputedStyle(key).transform;
+    name.classList.add('zooming'); // also stops the wizard bobbing
 
-    var o = measureO();
+    var r = wiz.getBoundingClientRect();
+    var unit = r.width / VB_W;
+    var ax = r.left + (ROBE.x - VB_X) * unit;
+    var ay = r.top + (ROBE.y - VB_Y) * unit;
     var nameRect = name.getBoundingClientRect();
+    name.style.transformOrigin = (ax - nameRect.left) + 'px ' + (ay - nameRect.top) + 'px';
 
-    // Scale until the hole (about half the O's width) is wider than the screen diagonal.
-    var diagonal = Math.hypot(window.innerWidth, window.innerHeight);
-    var scale = (diagonal / (o.width * 0.5)) * 1.3;
+    // Zoom until the robe covers the whole screen, drifting the robe to the centre.
+    var cx = window.innerWidth / 2, cy = window.innerHeight / 2;
+    var halfDiagonal = Math.hypot(cx, cy);
+    var logMax = Math.log(halfDiagonal / (ROBE.r * unit) * 1.15);
+    var DURATION = 1400;
+    var start = null;
 
-    name.style.transformOrigin =
-      (o.x - nameRect.left) + 'px ' + (o.y - nameRect.top) + 'px';
-    name.getBoundingClientRect(); // apply the origin before the transition starts
-    name.classList.add('zooming');
-    name.style.transform = 'scale(' + scale + ')';
+    function frame(now) {
+      if (start === null) start = now;
+      var p = Math.min(1, (now - start) / DURATION);
+      var e = p * p; // speed up as we fall in
+      name.style.transform = 'translate(' + ((cx - ax) * e) + 'px, ' + ((cy - ay) * e) + 'px) ' +
+        'scale(' + Math.exp(logMax * e) + ')';
+      if (p < 1) requestAnimationFrame(frame);
+      else go();
+    }
+    requestAnimationFrame(frame);
 
     var done = false;
     function go() {
       if (done) return;
       done = true;
+      document.documentElement.style.background = ROBE_COLOR;
       window.location.href = href;
     }
-    // Ignore transitions from the letters themselves (e.g. the hover lift ending).
-    name.addEventListener('transitionend', function (ev) {
-      if (ev.target === name && ev.propertyName === 'transform') go();
-    });
-    setTimeout(go, 2400); // fallback if transitionend doesn't fire
   });
 
   // If the user comes back with the browser's Back button, undo the zoom.
@@ -89,7 +129,10 @@
     zooming = false;
     name.classList.remove('zooming');
     name.style.transform = '';
+    document.documentElement.style.background = '';
     key.style.transition = '';
     key.style.transform = '';
+    try { sessionStorage.removeItem('arriveZoom'); } catch (err) {}
+    placeWizard();
   });
 })();

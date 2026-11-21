@@ -6,6 +6,15 @@
   <title>Otis Hunt</title>
   <link rel="stylesheet" href="css/fonts.css">
   <link rel="stylesheet" href="css/home.css">
+  <script>
+    // Coming from the cover's dive into the wizard: start inside his robe (see arrive() in home.js).
+    try {
+      if (sessionStorage.getItem('arriveZoom') && !location.hash &&
+          !matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        document.documentElement.classList.add('arriving');
+      }
+    } catch (e) {}
+  </script>
 </head>
 <body>
   <main class="world" id="world">
@@ -508,6 +517,9 @@
           <p>Hi! I'm Otis, I'm a 4th-year blended Master's student in Statistics at Cal Poly SLO, set to graduate in December 2027. I also carry a “Cross Disciplinary Minor in Data Science”, which is close to a double major in Data Science. I do research on campus, which I began with survey design and am now working on simulation problems in Robotics.</p>
         </div>
       </div>
+
+      <h3>What I work with</h3>
+      <p>Most of my work is in Python (pandas, scikit-learn and PyTorch). I'm interested in just about any problem, but right now, it's robotics simulation!</p>
     </div>
   </section>
 
@@ -527,9 +539,48 @@
 
   <section class="page" id="experience" hidden>
     <a class="back" href="#">← Leave shop (Esc)</a>
+    <!-- One <div class="scroll"> per role. Each is sold as its own scroll,
+         named after its <h2>. Copy a block to add another. -->
     <div class="scroll">
-      <h2>Experience</h2>
-      <p>List roles, schools, or anything else you want to show.</p>
+      <h2>Apple</h2>
+      <p class="meta">Software Engineering Intern · Incoming</p>
+      <p>Incoming Software Engineering Intern at Apple.</p>
+    </div>
+    <div class="scroll">
+      <h2>Cisco</h2>
+      <p class="meta">Data Science Intern · San Jose, CA · June 2026 – Aug 2026</p>
+      <ul>
+        <li>Built an end-to-end ML recommendation pipeline from scratch using Python, SQL, and Snowflake, transforming 100M+ enterprise records across 7 datasets into supervised training and evaluation data.</li>
+        <li>Engineered millions of ground-truth labels from historical and test data, validating labels against independent hardware datasets across a major organization spanning roughly 15 teams.</li>
+        <li>Trained ranking and recommendation models for repair decision support; ran ablations across semantic similarity, dense/sparse retrieval, structured features, label definitions, and model families.</li>
+        <li>Evaluated models using ranking quality, precision/recall, coverage, independent validation data, and human review; structured outputs for AI-agent workflows projected to reduce manual decision time by up to 80% and support millions in annualized repair cost savings.</li>
+      </ul>
+    </div>
+    <div class="scroll">
+      <h2>Simulation Research</h2>
+      <p class="meta">Undergraduate Researcher, Simulation (lomad) · Cal Poly SLO · Apr 2026 – June 2026</p>
+      <ul>
+        <li>Developed R-based simulation workflows to evaluate the statistical power and failure modes of lomad, an R package for detecting periods of decoupling between correlated time series.</li>
+        <li>Designed wide parameter sweeps varying autocorrelation, signal-to-noise ratio, coupling distance, sample size, and trend structure; executed simulation batches as Kubernetes Jobs.</li>
+        <li>Built a reproducible pipeline for aggregating, cleaning, summarizing, and visualizing simulation output; created documentation and parameterized scripts for reuse by other student researchers and faculty.</li>
+        <li>Evaluated method performance using false positive rate, sensitivity, and specificity; identified failure cases and produced results supporting theoretical findings and ongoing publication work.</li>
+      </ul>
+    </div>
+    <div class="scroll">
+      <h2>Survey Scale Research</h2>
+      <p class="meta">Undergraduate Researcher, Survey Scale Development · Cal Poly SLO · Sept 2024 – Present</p>
+      <ul>
+        <li>Lead an experimental study evaluating description-based response scales as alternatives to Likert scales for measuring students’ classroom experiences.</li>
+        <li>Use R to analyze quantitative survey responses and qualitatively coded video data, comparing response distributions and measurement performance across survey scale formats.</li>
+        <li>Develop predictive models from qualitative video encodings to benchmark performance against Likert-scale survey responses.</li>
+        <li>First author on an accepted refereed paper at ICOTS 2026; presented findings in Brisbane in July 2026.</li>
+      </ul>
+      <h3>Frost Summer Undergraduate Research Program</h3>
+      <p class="meta">June 2025 – Sept 2025</p>
+      <ul>
+        <li>Built an R data pipeline to clean, merge, and reshape survey datasets for downstream analysis.</li>
+        <li>Implemented linear regression, PCA, and ggplot2 visualizations to support exploratory analysis and comparison of survey response patterns.</li>
+      </ul>
     </div>
   </section>
 
@@ -537,7 +588,13 @@
     <a class="back" href="#">← Leave shop (Esc)</a>
     <div class="scroll">
       <h2>Contact</h2>
-      <p>Add your email and links here.</p>
+      <p>The quickest ways to send word:</p>
+      <ul class="contact-list">
+        <li><strong>Email:</strong> <a href="mailto:otis@order-sf.com">otis@order-sf.com</a></li>
+        <li><strong>LinkedIn:</strong> <a href="https://www.linkedin.com/in/otishunt">linkedin.com/in/otishunt</a></li>
+        <li><strong>GitHub:</strong> <a href="https://github.com/otishunt">github.com/otishunt</a></li>
+        <li><strong>Resume:</strong> <a href="Otis_Hunt_resume.pdf">PDF Resume</a></li>
+      </ul>
     </div>
   </section>
 

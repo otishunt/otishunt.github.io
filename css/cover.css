@@ -38,10 +38,59 @@ body {
   user-select: none;
 }
 
-/* Clicking the O: zoom slowly into the hole of the O */
+/* Clicking the O: dive into the wizard (driven frame by frame in cover.js) */
 .name.zooming {
-  transition: transform 2.2s cubic-bezier(0.55, 0, 0.9, 0.35);
   pointer-events: none;
+}
+
+/* The wizard hanging out in the bottom of the O (placed by cover.js) */
+.o-wizard {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: calc(0.36em * 30 / 66);
+  height: 0.36em;
+  overflow: visible;
+  pointer-events: none;
+  visibility: hidden;
+}
+
+.o-wizard.placed {
+  visibility: visible;
+}
+
+.o-wizard line,
+.o-wizard path,
+.o-wizard circle {
+  fill: #fff;
+  stroke: #000;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.o-wizard line   { stroke-width: 2.2; }
+.o-wizard .robe,
+.o-wizard .hat   { fill: #4b3fa8; } /* same robe as on the map */
+.o-wizard .trim  { fill: none; stroke: #ffc21a; stroke-width: 1.4; }
+.o-wizard .beard { fill: #f1f1f1; }
+.o-wizard .eye   { fill: #000; stroke: none; }
+.o-wizard .staff { stroke: #7a5230; stroke-width: 2.4; }
+.o-wizard .orb,
+.o-wizard .star  { fill: #ffc21a; }
+.o-wizard .star  { stroke-width: 0.8; }
+
+.o-wizard .wiz-body {
+  animation: wiz-bob 1.6s ease-in-out infinite;
+}
+
+.name.zooming .wiz-body {
+  animation: none;
+}
+
+@keyframes wiz-bob {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-2px); }
 }
 
 .space {
@@ -94,6 +143,9 @@ body {
 @media (prefers-reduced-motion: reduce) {
   .letter {
     transition: none;
+  }
+  .o-wizard .wiz-body {
+    animation: none;
   }
   .letter .hint {
     animation: hint-fade 1.1s linear forwards;

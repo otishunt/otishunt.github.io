@@ -432,7 +432,7 @@
     },
     experience: {
       keeper: 'guildmaster', name: 'Guildmaster Rowan',
-      pitch: 'Every quest Otis has taken on, recorded for the guild. ' + SCROLL_PRICE + ' gold, traveller.'
+      pitch: 'Every quest Otis has taken on, recorded for the guild, one scroll per quest. ' + SCROLL_PRICE + ' gold apiece, traveller.'
     },
     contact: {
       keeper: 'postmaster', name: 'Postmaster Pell',
@@ -697,6 +697,7 @@
 
   // ── Input ──────────────────────────────────────────────────────
   document.addEventListener('keydown', function (e) {
+    if (arriving) return; // still zooming out of the robe
     var tag = e.target.tagName;
     var onControl = tag === 'BUTTON' || tag === 'A';
 
@@ -750,6 +751,61 @@
     if (e.persisted) route();
   });
 
+  // ── Arriving from the cover: zoom out of the wizard's robe ─────
+  // The cover dives into the robe until it fills the screen; we start there and pull back.
+  var ROBE = { x: -4.4, y: -15, r: 3.4 }; // a spot with solid robe colour all around (same as cover.js)
+  var ROBE_RGB = [75, 63, 168];
+  var root = document.documentElement;
+  var arriving = root.classList.contains('arriving');
+
+  function arrive() {
+    try { sessionStorage.removeItem('arriveZoom'); } catch (e) {}
+    setIdle(false); // hold still so the robe stays put under the camera
+
+    var ctm = face.getScreenCTM();
+    var pt = svg.createSVGPoint();
+    pt.x = ROBE.x;
+    pt.y = ROBE.y;
+    var a = pt.matrixTransform(ctm);
+    var unit = Math.hypot(ctm.a, ctm.b);
+    var w = world.getBoundingClientRect();
+    world.style.transformOrigin = (a.x - w.left) + 'px ' + (a.y - w.top) + 'px';
+
+    var cx = window.innerWidth / 2, cy = window.innerHeight / 2;
+    var logMax = Math.log(Math.hypot(cx, cy) / (ROBE.r * unit) * 1.15);
+    var LOG_FADE_HI = Math.log(6), LOG_FADE_LO = Math.log(1.5);
+
+    function show(z) { // z: 1 = deep in the robe, 0 = the street at normal size
+      var logS = logMax * z;
+      world.style.transform = 'translate(' + ((cx - a.x) * z) + 'px, ' + ((cy - a.y) * z) + 'px) ' +
+        'scale(' + Math.exp(logS) + ')';
+      // Whatever peeks out around the map fades from robe colour to the page's white.
+      var k = Math.max(0, Math.min(1, (logS - LOG_FADE_LO) / (LOG_FADE_HI - LOG_FADE_LO)));
+      root.style.background = 'rgb(' + ROBE_RGB.map(function (c) {
+        return Math.round(255 + (c - 255) * k);
+      }).join(',') + ')';
+    }
+
+    show(1);
+    root.classList.add('zoom-set');
+
+    var DURATION = 1900;
+    var start = null;
+    function frame(now) {
+      if (start === null) start = now;
+      var p = Math.min(1, (now - start) / DURATION);
+      show((1 - p) * (1 - p)); // ease out: fast at first, settling onto the street
+      if (p < 1) { requestAnimationFrame(frame); return; }
+      world.style.transform = '';
+      world.style.transformOrigin = '';
+      root.style.background = '';
+      root.classList.remove('arriving', 'zoom-set'); // title, key and controls fade in
+      arriving = false;
+      setIdle(true);
+    }
+    requestAnimationFrame(frame);
+  }
+
   // ── Start ──────────────────────────────────────────────────────
   current = target = loadNode();
   resetTrail(nodePoint(current));
@@ -763,4 +819,11 @@
   pose(0);
   setIdle(true);
   route();
+  if (arriving) {
+    // Wait for fonts so the layout (and the wizard's spot on screen) won't shift mid-zoom.
+    var started = false;
+    var begin = function () { if (!started) { started = true; arrive(); } };
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(begin);
+    setTimeout(begin, 600);
+  }
 })();
