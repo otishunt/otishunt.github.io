@@ -399,7 +399,7 @@ figcaption {
   --rod: #8a5a2b;         /* wooden scroll rods */
   max-width: 760px;
   margin: 0 auto;
-  padding: 32px 16px 72px;
+  padding: 0 16px 72px;
   animation: arrive 0.5s ease both;
 }
 
@@ -407,20 +407,46 @@ figcaption {
   display: none;
 }
 
-/* Inside a shop the white page becomes the shop's warm plaster wall */
-html:has(body > .page:not([hidden])),
-body:has(> .page:not([hidden])) {
-  background: #f4ecdc;
+/* Inside a shop: the room fills the top of the page and the floor is wooden boards below it */
+html:has(body > .page:not([hidden])) {
+  background: #7a4e2c; /* the floor carries on below short pages */
 }
 
-.back {
-  display: inline-block;
-  margin-bottom: 36px;
+body:has(> .page:not([hidden])) {
+  overflow-x: clip; /* the room is full-bleed */
+  background-color: #8a5a33;
+  background-image:
+    repeating-linear-gradient(0deg, rgba(42, 26, 14, 0.35) 0 2px, transparent 2px 58px),
+    repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.04) 0 1px, transparent 1px 9px),
+    linear-gradient(#9a6a3f, #7a4e2c);
+}
+
+/* "Leave shop" and the purse float over the room's top corners as little wooden tags */
+.back,
+.purse {
+  position: absolute;
+  top: 14px;
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
+  padding: 6px 12px;
   font-family: "Lower Pixel", "Latin Modern", serif;
+  color: #2b2118;
+  background: #f6efe2;
+  border: 1.5px solid #3b2c22;
+  border-radius: 4px;
+  box-shadow: 2px 2px 0 #3b2c22;
   text-decoration: none;
 }
 
+.back {
+  left: 16px;
+}
+
 .back:hover {
+  background: #fff;
   text-decoration: underline;
 }
 
@@ -434,14 +460,7 @@ body:has(> .page:not([hidden])) {
 }
 
 .purse {
-  position: absolute;
-  top: 32px;
   right: 16px;
-  margin: 0;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-family: "Lower Pixel", "Latin Modern", serif;
 }
 
 .coin {
@@ -454,44 +473,49 @@ body:has(> .page:not([hidden])) {
 }
 
 .shop-ui {
-  margin-bottom: 44px;
+  margin-bottom: 52px;
   font-family: "Lower Pixel", "Latin Modern", serif;
 }
 
-.shop-scene {
-  display: grid;
-  grid-template-columns: minmax(0, 360px) minmax(0, 1fr);
-  gap: 20px;
-  align-items: center;
+/* The room: full screen width, cropped at the sides on narrow screens (never the shopkeeper) */
+.shop-band {
+  position: relative;
+  width: 100vw;
+  margin-left: calc(50% - 50vw);
 }
 
 .shop-art {
   display: block;
   width: 100%;
-  height: auto;
-  border: 1.5px solid #000;
+  height: clamp(280px, 34vw, 440px);
+  border-bottom: 4px solid #3b2c22;
 }
 
+/* The speech bubble sits in the room, to the left of the shopkeeper (the right wall has the props) */
 .speech {
-  position: relative;
-  padding: 16px 18px;
-  border: 1.5px solid #000;
-  background: #fff;
-  box-shadow: 4px 4px 0 #000;
+  position: absolute;
+  right: calc(50% + 7vw);
+  top: 22%;
+  width: min(340px, 30vw);
+  padding: 14px 16px;
+  border: 1.5px solid #3b2c22;
+  border-radius: 6px;
+  background: #fffaf0;
+  box-shadow: 4px 4px 0 #3b2c22;
 }
 
 .speech::before {
   /* the bubble's tail, pointing at the shopkeeper */
   content: "";
   position: absolute;
-  left: -11px;
+  right: -11px;
   top: 34px;
   width: 18px;
   height: 18px;
-  background: #fff;
-  border-left: 1.5px solid #000;
-  border-bottom: 1.5px solid #000;
-  transform: rotate(45deg);
+  background: #fffaf0;
+  border-left: 1.5px solid #3b2c22;
+  border-bottom: 1.5px solid #3b2c22;
+  transform: rotate(225deg);
 }
 
 .speech .speaker {
@@ -524,7 +548,7 @@ body:has(> .page:not([hidden])) {
   flex-wrap: wrap;
   align-items: center;
   gap: 14px;
-  margin-top: 18px;
+  margin-top: 22px;
 }
 
 .shop-actions[hidden] {
@@ -566,15 +590,16 @@ body:has(> .page:not([hidden])) {
 
 .hint {
   font-size: 14px;
-  opacity: 0.7;
+  color: #f6efe2;
+  opacity: 0.85;
 }
 
 /* Shop art: same line style as the map */
-.shop-art path,
-.shop-art rect,
-.shop-art circle,
-.shop-art ellipse {
-  stroke: #000;
+.shop-art .ink path,
+.shop-art .ink rect,
+.shop-art .ink circle,
+.shop-art .ink ellipse {
+  stroke: #3b2c22;
   stroke-width: 1.5;
   stroke-linejoin: round;
   stroke-linecap: round;
@@ -630,12 +655,18 @@ body:has(> .page:not([hidden])) {
   to   { clip-path: inset(-30px -30px -30px -30px); }
 }
 
-@media (max-width: 640px) {
-  .shop-scene {
-    grid-template-columns: minmax(0, 1fr);
+/* Narrow screens: no room beside the shopkeeper, so the bubble sits just under the counter */
+@media (max-width: 760px) {
+  .speech {
+    position: relative;
+    right: auto;
+    top: auto;
+    width: auto;
+    margin: -28px 16px 0;
   }
   .speech::before {
-    left: 40px;
+    right: auto;
+    left: 50%;
     top: -11px;
     transform: rotate(135deg);
   }

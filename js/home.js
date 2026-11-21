@@ -517,30 +517,197 @@
     return '<rect class="k-letter" x="40" y="184" width="34" height="12" /><rect class="k-letter" x="44" y="176" width="34" height="12" /><path class="k-line" d="M44 176 l17 7 l17 -7" /><path class="k-quill" d="M92 196 Q100 170 118 156 Q108 176 96 196 Z" />';
   }
 
-  function shopScene(kind) {
-    var a = '<svg class="shop-art" viewBox="0 0 360 260" aria-hidden="true">';
-    a += '<rect class="k-wall" x="0" y="0" width="360" height="260" />';
-    // shelves with scrolls, jars and a candle
-    a += '<path class="k-shelf" d="M14 70 H346 V76 H14 Z M14 132 H346 V138 H14 Z" />';
-    // rolled scrolls lying on the shelves, some stacked two high: [x, shelf y, stack height]
-    [[30, 70, 2], [66, 70, 1], [262, 70, 1], [296, 70, 2], [36, 132, 1], [286, 132, 2]].forEach(function (p) {
-      for (var k = 0; k < p[2]; k++) {
-        a += '<rect class="k-roll" x="' + (p[0] + k * 3) + '" y="' + (p[1] - 11 - k * 11) + '" width="30" height="11" rx="5.5" />';
+  // ── The shop interior: a full-width room behind the counter ──
+  // Drawn on a 1200×400 canvas that fills the screen width (cropping the sides on phones, never the
+  // shopkeeper). The shopkeeper art above was drawn for a 360×260 scene; it's scaled into place here.
+  var INK = '#3b2c22';
+  var ROOMS = {
+    archivist:   { wall: '#efe2c6', accent: '#8f2a1c' },
+    tinker:      { wall: '#e6dccb', accent: '#4f6fa3' },
+    guildmaster: { wall: '#eadbb4', accent: '#4c8a5e' },
+    postmaster:  { wall: '#efe6d6', accent: '#7d4f6a' }
+  };
+
+  function spin(cx, cy, seconds, reverse) {
+    if (reduceMotion) return '';
+    return '<animateTransform attributeName="transform" type="rotate" from="0 ' + cx + ' ' + cy + '" to="' +
+      (reverse ? -360 : 360) + ' ' + cx + ' ' + cy + '" dur="' + seconds + 's" repeatCount="indefinite" />';
+  }
+
+  function gear(cx, cy, r, teeth, seconds, reverse) {
+    var d = '', step = Math.PI * 2 / teeth;
+    for (var i = 0; i < teeth; i++) {
+      var a = i * step;
+      [[a - step * 0.28, r * 0.8], [a - step * 0.16, r], [a + step * 0.16, r], [a + step * 0.28, r * 0.8]].forEach(function (p, k) {
+        d += (i === 0 && k === 0 ? 'M' : 'L') + (cx + Math.cos(p[0]) * p[1]).toFixed(1) + ' ' + (cy + Math.sin(p[0]) * p[1]).toFixed(1) + ' ';
+      });
+    }
+    return '<g>' + spin(cx, cy, seconds, reverse) +
+      '<path d="' + d + 'Z" fill="#b9bec7" stroke="' + INK + '" stroke-width="1.5" />' +
+      '<circle cx="' + cx + '" cy="' + cy + '" r="' + (r * 0.55) + '" fill="#9aa0aa" stroke="' + INK + '" stroke-width="1.2" />' +
+      '<circle cx="' + cx + '" cy="' + cy + '" r="' + (r * 0.16) + '" fill="#5b3a26" /></g>';
+  }
+
+  // Deterministic "random" so every visit draws the same books.
+  function wobble(i, salt) {
+    var x = Math.sin(i * 12.9898 + salt * 78.233) * 43758.5453;
+    return x - Math.floor(x);
+  }
+
+  function roomProps(kind, id) {
+    var a = '';
+    if (kind === 'archivist') {
+      // a tapestry map behind the archivist
+      a += '<path d="M520 34 H680 V172 H520 Z" fill="#f3e2bd" stroke="' + INK + '" stroke-width="2" />';
+      a += '<path d="M514 34 H686" stroke="#5b3a26" stroke-width="6" stroke-linecap="round" />';
+      a += '<path d="M540 70 q20 -14 36 4 t40 -2 q16 10 34 -6 M548 120 q24 10 44 -8 t48 6 M560 150 q20 -6 40 4" fill="none" stroke="#8a6a3a" stroke-width="1.6" />';
+      a += '<path d="M612 96 l5 10 l-10 0 Z M596 108 l4 8 l-8 0 Z" fill="#6f8f6a" /><path d="M640 136 l-8 8 M632 136 l8 8" stroke="#8f2a1c" stroke-width="2" />';
+      // a portrait in a gilt frame
+      a += '<rect x="732" y="74" width="100" height="92" fill="#c9a24a" stroke="' + INK + '" stroke-width="2" />';
+      a += '<rect x="742" y="84" width="80" height="72" fill="url(#' + id + 'sky)" /><path d="M742 140 q20 -24 40 -6 q20 -18 40 0 V156 H742 Z" fill="#87b066" />';
+      // a tall bookcase
+      a += '<path d="M880 34 H1130 V300 H880 Z" fill="#6b4424" stroke="' + INK + '" stroke-width="2" />';
+      var colors = ['#8f2a1c', '#3f5c8a', '#6f8f6a', '#c9a24a', '#7d4f6a', '#a8743d', '#2f466c'];
+      [96, 160, 224, 292].forEach(function (shelfY, row) {
+        a += '<path d="M886 ' + shelfY + ' H1124 V' + (shelfY + 6) + ' H886 Z" fill="#8a5a33" />';
+        var x = 892;
+        for (var i = 0; x < 1110; i++) {
+          var w = 10 + Math.floor(wobble(i, row) * 8);
+          var h = 36 + Math.floor(wobble(i, row + 9) * 18);
+          if (wobble(i, row + 3) < 0.08) { x += 14; continue; }
+          a += '<rect x="' + x + '" y="' + (shelfY - h) + '" width="' + w + '" height="' + h + '" fill="' + colors[(i + row * 3) % colors.length] +
+               '" stroke="' + INK + '" stroke-width="1.2" /><path d="M' + (x + 2) + ' ' + (shelfY - h + 8) + ' h' + (w - 4) + '" stroke="#f3e2bd" stroke-width="1.5" />';
+          x += w + 1;
+        }
+      });
+      a += '<path d="M1060 34 v-8" stroke="' + INK + '" stroke-width="1" />';
+    }
+    if (kind === 'tinker') {
+      a += gear(588, 92, 52, 12, 18, false) + gear(664, 54, 30, 8, 10.4, true) + gear(520, 150, 24, 8, 8, true);
+      // blueprint pinned to the wall
+      a += '<path d="M722 70 L852 64 L856 170 L726 176 Z" fill="#3f6fa3" stroke="' + INK + '" stroke-width="2" />';
+      a += '<path d="M740 150 L800 92 L840 130 M760 90 h40 v30 h-40 Z M746 160 h60" fill="none" stroke="#dbe8f6" stroke-width="1.6" />';
+      a += '<circle cx="728" cy="74" r="4" fill="#c0504a" /><circle cx="850" cy="68" r="4" fill="#c0504a" />';
+      // pegboard with tools
+      a += '<path d="M880 44 H1130 V286 H880 Z" fill="#c9a37a" stroke="' + INK + '" stroke-width="2" />';
+      for (var py = 58; py < 280; py += 18) for (var px = 894; px < 1124; px += 18) a += '<circle cx="' + px + '" cy="' + py + '" r="2" fill="#9c7a52" />';
+      a += '<g fill="#9aa0aa" stroke="' + INK + '" stroke-width="1.5" stroke-linejoin="round">' +
+           '<path d="M916 70 h10 v110 h-10 Z" fill="#a8743d" /><path d="M904 64 h34 v18 h-34 Z" />' +                       // hammer
+           '<path d="M966 70 a14 14 0 1 1 0 26 v86 h-10 v-86 a14 14 0 1 1 0 -26 v12 h10 Z" />' +                         // wrench
+           '<path d="M1010 74 h70 l-8 50 h-62 Z" fill="#cfd4dc" /><path d="M1080 74 h20 v24 h-20 Z" fill="#a8743d" />' +    // saw
+           '<path d="M1020 160 l24 90 h-10 l-22 -84 Z M1060 160 l-24 90 h10 l22 -84 Z" fill="#c0504a" />' +                // pliers
+           '<path d="M1100 150 h10 v60 h-10 Z" fill="#c9a24a" /><path d="M1103 210 h4 v50 h-4 Z" /></g>';                 // screwdriver
+    }
+    if (kind === 'guildmaster') {
+      // the guild banner
+      a += '<path d="M540 26 H660 V176 L600 150 L540 176 Z" fill="#4c8a5e" stroke="' + INK + '" stroke-width="2" />';
+      a += '<path d="M550 36 H650 V164 L600 142 L550 164 Z" fill="none" stroke="#ffc21a" stroke-width="2" />';
+      a += '<path d="M578 66 H622 V96 Q622 116 600 124 Q578 116 578 96 Z" fill="#8f2a1c" stroke="#ffc21a" stroke-width="2" />';
+      a += '<path d="M600 74 l4 9 l9 1 l-7 6 l2 9 l-8 -5 l-8 5 l2 -9 l-7 -6 l9 -1 Z" fill="#ffc21a" />';
+      // crossed swords over a shield
+      a += '<path d="M730 70 L836 190 M836 70 L730 190" stroke="#cfd4dc" stroke-width="7" stroke-linecap="round" />';
+      a += '<path d="M730 70 L836 190 M836 70 L730 190" stroke="' + INK + '" stroke-width="1.2" stroke-linecap="round" fill="none" />';
+      a += '<path d="M744 176 l-12 12 M822 176 l12 12" stroke="#a8743d" stroke-width="6" stroke-linecap="round" />';
+      a += '<path d="M756 96 H810 V132 Q810 160 783 170 Q756 160 756 132 Z" fill="#3f5c8a" stroke="' + INK + '" stroke-width="2" />';
+      a += '<path d="M783 104 V162 M760 130 H806" stroke="#ffc21a" stroke-width="3" />';
+      // the quest board, papers pinned all over it
+      a += '<path d="M880 56 H1124 V270 H880 Z" fill="#b98a56" stroke="#5b3a26" stroke-width="8" />';
+      [[900, 72, -4], [968, 80, 3], [1040, 70, -2], [906, 160, 2], [980, 170, -5], [1050, 158, 4]].forEach(function (q, i) {
+        a += '<g transform="rotate(' + q[2] + ' ' + (q[0] + 28) + ' ' + (q[1] + 36) + ')"><path d="M' + q[0] + ' ' + q[1] + ' h56 v74 h-56 Z" fill="#f6efe2" stroke="' + INK + '" stroke-width="1.2" />' +
+             '<path d="M' + (q[0] + 8) + ' ' + (q[1] + 16) + ' h40 M' + (q[0] + 8) + ' ' + (q[1] + 28) + ' h34 M' + (q[0] + 8) + ' ' + (q[1] + 40) + ' h38 M' + (q[0] + 8) + ' ' + (q[1] + 52) + ' h26" stroke="#8a7a62" stroke-width="2" />' +
+             '<circle cx="' + (q[0] + 28) + '" cy="' + (q[1] + 6) + '" r="3.5" fill="' + (i % 2 ? '#c0504a' : '#4f6fa3') + '" /></g>';
+      });
+    }
+    if (kind === 'postmaster') {
+      // wall clock, its minute hand going round
+      a += '<circle cx="600" cy="80" r="42" fill="#5b3a26" stroke="' + INK + '" stroke-width="2" /><circle cx="600" cy="80" r="34" fill="#f6efe2" />';
+      for (var h = 0; h < 12; h++) {
+        var ang = h * Math.PI / 6;
+        a += '<path d="M' + (600 + Math.cos(ang) * 27).toFixed(1) + ' ' + (80 + Math.sin(ang) * 27).toFixed(1) + ' L' + (600 + Math.cos(ang) * 31).toFixed(1) + ' ' + (80 + Math.sin(ang) * 31).toFixed(1) + '" stroke="' + INK + '" stroke-width="2" />';
       }
+      a += '<path d="M600 80 L616 89" stroke="' + INK + '" stroke-width="3.5" stroke-linecap="round" />';
+      a += '<g>' + spin(600, 80, 30, false) + '<path d="M600 80 V52" stroke="' + INK + '" stroke-width="2.2" stroke-linecap="round" /></g>';
+      a += '<circle cx="600" cy="80" r="3" fill="' + INK + '" />';
+      // a mail bag on a hook
+      a += '<path d="M780 60 v14" stroke="#3b3530" stroke-width="3" /><path d="M752 84 Q780 70 808 84 L816 170 Q780 184 744 170 Z" fill="#a8743d" stroke="' + INK + '" stroke-width="2" />';
+      a += '<path d="M756 104 Q780 112 804 104" fill="none" stroke="' + INK + '" stroke-width="1.5" /><path d="M766 128 h28 v18 h-28 Z M766 128 l14 9 l14 -9" fill="#f6efe2" stroke="' + INK + '" stroke-width="1.3" />';
+      // pigeonholes full of letters
+      a += '<path d="M876 50 H1132 V290 H876 Z" fill="#6b4424" stroke="' + INK + '" stroke-width="2" />';
+      for (var r = 0; r < 4; r++) for (var c = 0; c < 5; c++) {
+        var x0 = 884 + c * 49.6, y0 = 58 + r * 58;
+        a += '<path d="M' + x0.toFixed(1) + ' ' + y0 + ' h42 v50 h-42 Z" fill="#3e2716" />';
+        var n = Math.floor(wobble(c, r) * 4);
+        for (var k = 0; k < n; k++) {
+          a += '<path d="M' + (x0 + 4 + k * 3).toFixed(1) + ' ' + (y0 + 50 - 22 - k * 5) + ' h32 v20 h-32 Z" fill="' + (k % 2 ? '#f6efe2' : '#efe0c4') + '" stroke="' + INK + '" stroke-width="1" />';
+        }
+        if (wobble(r, c) > 0.75) a += '<path d="M' + (x0 + 6).toFixed(1) + ' ' + (y0 + 20) + ' h30 v30 h-30 Z" fill="#c9a37a" stroke="' + INK + '" stroke-width="1.2" /><path d="M' + (x0 + 21).toFixed(1) + ' ' + (y0 + 20) + ' v30 M' + (x0 + 6).toFixed(1) + ' ' + (y0 + 35) + ' h30" stroke="#8f2a1c" stroke-width="1.5" />';
+      }
+      // a pigeon perched on top, bobbing
+      a += '<g>' + (reduceMotion ? '' : '<animateTransform attributeName="transform" type="translate" values="0 0; 0 -3; 0 0" dur="1.4s" repeatCount="indefinite" />') +
+           '<ellipse cx="1004" cy="38" rx="16" ry="11" fill="#9aa3b5" stroke="' + INK + '" stroke-width="1.5" />' +
+           '<circle cx="1018" cy="26" r="7" fill="#9aa3b5" stroke="' + INK + '" stroke-width="1.5" /><path d="M1024 26 l6 2 l-6 2 Z" fill="#ff8c1a" />' +
+           '<circle cx="1020" cy="24" r="1.3" fill="' + INK + '" /><path d="M990 34 q10 6 20 2" fill="none" stroke="#6f7890" stroke-width="2" />' +
+           '<path d="M1000 49 v4 M1008 49 v4" stroke="#ff8c1a" stroke-width="2" /></g>';
+    }
+    return a;
+  }
+
+  function shopScene(kind) {
+    var room = ROOMS[kind], id = 'room-' + kind + '-';
+    var a = '<svg class="shop-art" viewBox="0 0 1200 400" preserveAspectRatio="xMidYMax slice" aria-hidden="true">';
+    a += '<defs>' +
+      '<linearGradient id="' + id + 'sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#8fb8de" /><stop offset="1" stop-color="#f7e1c4" /></linearGradient>' +
+      '<linearGradient id="' + id + 'shaft" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff6d8" stop-opacity=".55" /><stop offset="1" stop-color="#fff6d8" stop-opacity="0" /></linearGradient>' +
+      '<radialGradient id="' + id + 'glow"><stop offset="0" stop-color="#ffe9a0" stop-opacity=".8" /><stop offset="1" stop-color="#ffe9a0" stop-opacity="0" /></radialGradient>' +
+      '<radialGradient id="' + id + 'dim" cx=".5" cy=".55" r=".75"><stop offset=".55" stop-color="#2a1a0e" stop-opacity="0" /><stop offset="1" stop-color="#2a1a0e" stop-opacity=".38" /></radialGradient>' +
+      '</defs>';
+    // walls, wainscot, ceiling beam and posts
+    a += '<rect width="1200" height="400" fill="' + room.wall + '" />';
+    a += '<ellipse cx="300" cy="60" rx="140" ry="40" fill="#fff" opacity=".22" /><ellipse cx="980" cy="210" rx="160" ry="50" fill="#5b3a26" opacity=".05" />';
+    a += '<rect y="236" width="1200" height="64" fill="#8a5a33" /><path d="' +
+      [0, 1, 2, 3, 4, 5, 6, 7].map(function (i) { return 'M' + (i * 150 + 12) + ' 246 h126 v44 h-126 Z'; }).join(' ') +
+      '" fill="#9a6a3f" stroke="#5b3a26" stroke-width="1.5" />';
+    a += '<rect width="1200" height="26" fill="#5b3a26" /><path d="' +
+      [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11].map(function (i) { return 'M' + (i * 104 + 30) + ' 26 h22 v8 h-22 Z'; }).join(' ') + '" fill="#4a2e18" />';
+    [40, 340, 860, 1150].forEach(function (x) {
+      a += '<path d="M' + x + ' 26 h20 V300 h-20 Z" fill="#5b3a26" />';
+      a += '<path d="M' + (x + 20) + ' 70 L' + (x + 60) + ' 26 M' + x + ' 70 L' + (x - 40) + ' 26" stroke="#5b3a26" stroke-width="10" />';
     });
-    a += '<rect class="k-jar1" x="112" y="46" width="16" height="24" rx="3" /><rect class="k-jar2" x="232" y="50" width="14" height="20" rx="3" />';
-    a += '<rect class="k-jar3" x="80" y="108" width="18" height="24" rx="3" /><rect class="k-jar1" x="258" y="112" width="14" height="20" rx="3" />';
-    a += '<rect class="k-candle" x="318" y="112" width="6" height="20" /><path class="k-flame" d="M321 112 q-4 -6 0 -12 q4 6 0 12 Z" />';
-    a += keeperArt(kind);
-    // counter
-    a += '<rect class="k-counter" x="8" y="200" width="344" height="60" />';
-    a += '<rect class="k-countertop" x="4" y="196" width="352" height="10" />';
-    a += '<path class="k-line" d="M90 206 V260 M180 206 V260 M270 206 V260" />';
-    a += keeperHands(kind);
-    a += propArt(kind);
-    // the scroll for sale, tied with a red ribbon
-    a += '<g class="for-sale"><rect class="k-roll" x="238" y="180" width="64" height="16" rx="8" />';
-    a += '<rect class="k-ribbon" x="266" y="179" width="8" height="18" /></g>';
+    // an arched window onto the town, with daylight falling in
+    a += '<path d="M120 236 V140 A80 80 0 0 1 280 140 V236 Z" fill="url(#' + id + 'sky)" />';
+    a += '<path d="M120 236 V196 l20 -14 l18 10 v-22 l22 -16 l22 16 v18 l18 -12 l22 14 l20 -10 l18 12 V236 Z" fill="#b89f92" opacity=".8" />';
+    a += '<path d="M120 236 V140 A80 80 0 0 1 280 140 V236 Z M200 60 V236 M120 160 H280" fill="none" stroke="#5b3a26" stroke-width="8" />';
+    a += '<path d="M108 236 h184 v10 h-184 Z" fill="#9c8f80" stroke="' + INK + '" stroke-width="1.2" />';
+    a += '<path d="M128 70 L286 120 L560 300 L300 300 Z" fill="url(#' + id + 'shaft)" />';
+    // shelves between the window and the counter
+    a += '<g stroke="' + INK + '" stroke-width="1.3">' +
+      '<path d="M380 120 H500 V126 H380 Z M380 196 H500 V202 H380 Z" fill="#a8743d" />' +
+      '<rect x="390" y="96" width="16" height="24" rx="3" fill="#d6eaf8" /><rect x="414" y="102" width="14" height="18" rx="3" fill="#f0cdbd" />' +
+      '<rect x="440" y="109" width="30" height="11" rx="5.5" fill="#f3e2bd" /><rect x="444" y="98" width="30" height="11" rx="5.5" fill="#f3e2bd" />' +
+      '<rect x="392" y="185" width="30" height="11" rx="5.5" fill="#f3e2bd" /><rect x="432" y="172" width="18" height="24" rx="3" fill="#d9efcf" />' +
+      '<rect x="476" y="176" width="6" height="20" fill="#fff" /><path d="M479 176 q-4 -6 0 -12 q4 6 0 12 Z" fill="#ffc21a" /></g>';
+    a += '<circle cx="479" cy="166" r="16" fill="url(#' + id + 'glow)" />';
+    a += roomProps(kind, id);
+    // hanging lanterns
+    [440, 780].forEach(function (x) {
+      a += '<circle cx="' + x + '" cy="80" r="34" fill="url(#' + id + 'glow)" />';
+      a += '<path d="M' + x + ' 26 V62" stroke="#3b3530" stroke-width="2" /><path d="M' + (x - 9) + ' 62 h18 l-3 26 h-12 Z" fill="#ffe08a" stroke="#3b3530" stroke-width="2" />' +
+           '<path d="M' + (x - 11) + ' 62 h22 l-11 -8 Z M' + (x - 8) + ' 88 h16 v4 h-16 Z" fill="#3b3530" />';
+    });
+    // the shopkeeper, then the counter, then hands and wares on top of it
+    var place = '<g class="ink" transform="translate(330 6) scale(1.5)">';
+    a += place + keeperArt(kind) + '</g>';
+    a += '<rect y="300" width="1200" height="100" fill="#9a6a3f" />';
+    a += '<path d="' + [0, 1, 2, 3, 4, 5, 6, 7].map(function (i) { return 'M' + (i * 150 + 14) + ' 318 h122 v70 h-122 Z'; }).join(' ') +
+      '" fill="#a8743d" stroke="#6b4424" stroke-width="2" />';
+    a += '<rect y="290" width="1200" height="16" fill="#6b4424" /><path d="M0 292 H1200" stroke="#a8743d" stroke-width="2" />';
+    a += '<rect y="306" width="1200" height="6" fill="#2a1a0e" opacity=".25" />';
+    a += place + keeperHands(kind) + propArt(kind) +
+      '<g class="for-sale"><rect class="k-roll" x="238" y="180" width="64" height="16" rx="8" />' +
+      '<rect class="k-ribbon" x="266" y="179" width="8" height="18" /></g></g>';
+    // a little brass bell on the counter
+    a += '<path d="M818 290 a12 12 0 0 1 24 0 Z" fill="#c9a24a" stroke="' + INK + '" stroke-width="1.5" /><path d="M812 290 h36" stroke="' + INK + '" stroke-width="2.5" /><circle cx="830" cy="276" r="2.5" fill="' + INK + '" />';
+    a += '<rect width="1200" height="400" fill="url(#' + id + 'dim)" />';
     return a + '</svg>';
   }
 
@@ -574,7 +741,7 @@
       var shop = document.createElement('div');
       shop.className = 'shop-ui';
       shop.innerHTML =
-        '<div class="shop-scene">' + shopScene(info.keeper) +
+        '<div class="shop-band">' + shopScene(info.keeper) +
         '<div class="speech"><p class="speaker">' + info.name + '</p>' +
         '<p class="line" aria-hidden="true"></p><p class="sr-only" aria-live="polite"></p></div></div>' +
         '<div class="shop-actions"><div class="buy-list"></div>' +
