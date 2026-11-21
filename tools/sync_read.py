@@ -22,6 +22,8 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 VOID = {'area', 'base', 'br', 'col', 'embed', 'hr', 'img', 'input', 'link', 'meta', 'source', 'track', 'wbr'}
 
 # Which shop sections appear, in what order, and under what heading.
+RESUME = 'Otis_Hunt_resume.pdf'   # linked in the header when the file is in the repo
+
 SECTIONS = [('about', 'About'), ('experience', 'Experience'), ('projects', 'Projects &amp; Research'), ('contact', 'Contact')]
 
 
@@ -198,8 +200,11 @@ def main():
         return [n for n in pages[sid].elements() if 'scroll' in n.cls()]
 
     contacts = contact_items(scrolls('contact')[0])
-    header_links = '\n'.join('        <a href="%s">%s</a>' % (href, 'Resume (PDF)' if label.lower() == 'resume' else label)
-                             for label, href, _ in contacts if href)
+    links = [(href, label) for label, href, _ in contacts if href]
+    # The resume isn't a way to get in touch, so it's not in the Contact scroll, but it belongs up top here.
+    if os.path.exists(os.path.join(ROOT, RESUME)) and not any(href == RESUME for href, _ in links):
+        links.append((RESUME, 'Resume (PDF)'))
+    header_links = '\n'.join('        <a href="%s">%s</a>' % (href, label) for href, label in links)
 
     body = []
     for sid, title in SECTIONS:

@@ -16,7 +16,11 @@ from shapely.geometry import Point, box, LineString, Polygon
 from shapely.ops import unary_union
 
 random.seed(11)
-W, H = 1000, 530
+W, H = 1000, 530            # the town itself; stops, shops and the castle all sit inside this
+# The drawn world is bigger than the town, so the map can fill any screen shape without cropping the
+# town: forest and meadow carry on all round. Must match the <svg viewBox> in home.html and WORLD in home.js.
+WX0, WY0, WX1, WY1 = -300, -200, 1300, 730
+CORE = None                 # set below, once shapely is imported (box of the town)
 ROAD_HALF = 22
 
 def f(v):
@@ -39,8 +43,8 @@ SEGS = [
     [line((430, 370), (500, 370)), climb((500, 370), (600, 260)), line((600, 260), (630, 260))],
     [line((630, 260), (700, 260)), climb((700, 260), (800, 150)), line((800, 150), (830, 150))],
 ]
-LEAD_IN = [line((-40, 480), (60, 480))]
-ONWARD = [line((830, 150), (900, 150)), climb((900, 150), (1000, 70)), line((1000, 70), (1060, 70))]
+LEAD_IN = [line((WX0 - 40, 480), (60, 480))]
+ONWARD = [line((830, 150), (900, 150)), climb((900, 150), (1000, 70)), line((1000, 70), (WX1 + 40, 70))]
 
 def bez(c, t):
     (x0, y0), (x1, y1), (x2, y2), (x3, y3) = c
@@ -66,7 +70,8 @@ def seg_d(curves):
 all_curves = LEAD_IN + [c for s in SEGS for c in s] + ONWARD
 center = LineString(sample(all_curves))
 road = center.buffer(ROAD_HALF, 24)
-frame = box(-60, -60, W + 60, H + 60)
+frame = box(WX0 - 40, WY0 - 40, WX1 + 40, WY1 + 40)
+CORE = box(0, 0, W, H)
 road = road.intersection(frame)
 
 def ring_d(coords):
@@ -104,7 +109,7 @@ def smooth(points, n=12):
     out.append(points[-1])
     return out
 
-STREAM = [(735, -20), (742, 60), (728, 130), (752, 205), (790, 280), (775, 350), (820, 420), (880, 470), (930, 545)]
+STREAM = [(700, WY0 - 40), (760, -150), (735, -20), (742, 60), (728, 130), (752, 205), (790, 280), (775, 350), (820, 420), (880, 470), (930, 545), (960, 650), (1010, WY1 + 40)]
 stream_line = LineString(smooth(STREAM))
 stream = unary_union([stream_line.buffer(15, 16)])
 POND = Point(905, 330).buffer(40, 32)
@@ -306,7 +311,17 @@ def castle():
                      % (f(cx), f(ft), f(ft - 16), INK, f(cx), f(ft - 16), INK))
         return ''.join(t)
 
-    o.append('<ellipse cx="10" cy="6" rx="130" ry="14" fill="#1f2a14" opacity=".22"/>')
+    # the moat: a ring of water all the way round (the castle is drawn over its inner edge)
+    def rrect(x0, y0, x1, y1, r):
+        return ('M%s %s H%s A%s %s 0 0 1 %s %s V%s A%s %s 0 0 1 %s %s H%s A%s %s 0 0 1 %s %s V%s A%s %s 0 0 1 %s %s Z'
+                % (f(x0 + r), f(y0), f(x1 - r), r, r, f(x1), f(y0 + r), f(y1 - r), r, r, f(x1 - r), f(y1),
+                   f(x0 + r), r, r, f(x0), f(y1 - r), f(y0 + r), r, r, f(x0 + r), f(y0)))
+    # its far side runs behind the keep, so only the corners show, curving in round the back
+    ring = rrect(-142, -104, 142, 19, 38) + ' ' + rrect(-125, -88, 125, 4, 24)
+    o.append('<path d="%s" fill="#7fb6d6" fill-rule="evenodd" stroke="#5f8fae" stroke-width="2"/>' % ring)
+    o.append('<path d="M-104 12 h14 M-60 11 h12 M40 12 h14 M86 11 h12 M-134 -20 v12 M134 -30 v12 M-134 -62 v10 M134 -66 v10"'
+             ' stroke="#d6ecf7" stroke-width="1.5" stroke-linecap="round"/>')
+    o.append('<ellipse cx="10" cy="2" rx="128" ry="10" fill="#1f2a14" opacity=".18"/>')
     # back towers and the keep, rising above the front wall (they hide the yard)
     o.append(round_tower(-74, -60, -128, 13, '#5c4a6e', lit=False))
     o.append(round_tower(74, -60, -128, 13, '#5c4a6e', lit=False))
@@ -353,10 +368,17 @@ def castle():
     # front corner towers, tallest of all
     o.append(round_tower(-104, 2, -92, 17, '#6f4a78'))
     o.append(round_tower(104, 2, -92, 17, '#6f4a78'))
-    # moat and drawbridge
-    o.append('<path d="M-128 4 H128 V16 H-128 Z" fill="#7fb6d6" stroke="#5f8fae" stroke-width="1.5"/>')
-    o.append('<path d="M-110 10 h14 M-60 9 h12 M40 10 h14 M90 9 h12" stroke="#d6ecf7" stroke-width="1.5" stroke-linecap="round"/>')
-    o.append('<path d="M-14 0 h28 v20 h-28 Z" fill="#a8743d" stroke="#5b3a26" stroke-width="1.4"/>'
+    # an alligator patrolling the moat (swims via CSS: .gator)
+    o.append('<g transform="translate(56 12)"><g class="gator">'
+             '<path d="M-20 0 q-8 -1 -12 2 q5 1 12 1 Z" fill="#4f7a45" stroke="%s" stroke-width=".8"/>'
+             '<ellipse cx="-4" cy="0" rx="17" ry="4.2" fill="#5f8f4e" stroke="%s" stroke-width="1"/>'
+             '<path d="M-14 -3 l2 -2 l2 2 M-8 -4 l2 -2 l2 2 M-2 -4 l2 -2 l2 2 M4 -3.5 l2 -2 l2 2" fill="none" stroke="#3f6b3d" stroke-width="1"/>'
+             '<path d="M12 -1.5 q10 -1 15 1 q-5 2.5 -15 1.5 Z" fill="#6f9a55" stroke="%s" stroke-width="1"/>'
+             '<circle cx="12" cy="-3.6" r="1.9" fill="#6f9a55" stroke="%s" stroke-width=".8"/><circle cx="12.4" cy="-3.9" r=".8" fill="#ffd24a"/>'
+             '<path d="M-22 4.5 q4 -1.5 8 0 M18 3.5 q5 -1.5 9 .5" fill="none" stroke="#d6ecf7" stroke-width="1.1" stroke-linecap="round"/>'
+             '</g></g>' % (INK, INK, INK, INK))
+    # drawbridge across the front of the moat
+    o.append('<path d="M-14 0 h28 v21 h-28 Z" fill="#a8743d" stroke="#5b3a26" stroke-width="1.4"/>'
              '<path d="M-14 5 h28 M-14 10 h28 M-14 15 h28" stroke="#6b4a2c" stroke-width="1"/>'
              '<path d="M-14 0 L-20 -26 M14 0 L20 -26" stroke="#3d3230" stroke-width="1.2"/>')
     o.append('</g>')
@@ -382,6 +404,13 @@ FIELDS = [  # x, y, w, h, crop colour, row colour
     (330, 40, 120, 60, '#d9c46a', '#b89c45'),
     (330, 106, 120, 56, '#9cbf6a', '#7da152'),
     (585, 18, 120, 44, '#c9b46a', '#a8924c'),
+    # out in the countryside beyond the town
+    (-270, -170, 150, 70, '#d9c46a', '#b89c45'),
+    (-270, -94, 150, 60, '#a9c46a', '#8aa552'),
+    (1100, 230, 160, 80, '#c9b46a', '#a8924c'),
+    (1100, 316, 160, 64, '#9cbf6a', '#7da152'),
+    (-270, 590, 150, 80, '#d9c46a', '#b89c45'),
+    (180, -170, 170, 60, '#c9b46a', '#a8924c'),
 ]
 def fields():
     o = []
@@ -400,7 +429,7 @@ def fields():
     return ''.join(o)
 
 fields_area = unary_union([box(x - 6, y - 6, x + w + 6, y + h + 8) for x, y, w, h, _, _ in FIELDS] + [box(320, 30, 490, 172)])
-castle_area = box(CASTLE_AT[0] - 138, CASTLE_AT[1] - 230, CASTLE_AT[0] + 138, CASTLE_AT[1] + 22)
+castle_area = box(CASTLE_AT[0] - 146, CASTLE_AT[1] - 230, CASTLE_AT[0] + 146, CASTLE_AT[1] + 24)
 mill_area = box(MILL_AT[0] - 50, MILL_AT[1] - 112, MILL_AT[0] + 50, MILL_AT[1] + 10)
 start_zone = box(-10, 440, 160, 540)
 
@@ -422,8 +451,10 @@ def try_place(rect, svg, y, max_overlap=0.2, avoid_start=True):
     items.append((y, svg))
     return True
 
-for _ in range(900):
-    x, y = random.uniform(10, 990), random.uniform(60, 545)
+for _ in range(2600):
+    x, y = random.uniform(WX0 + 10, WX1 - 10), random.uniform(WY0 + 60, WY1 + 15)
+    if not CORE.contains(Point(x, y)) and random.random() < 0.96:
+        continue       # the border is mostly forest, with the odd cottage
     w = random.choice([44, 50, 56, 62, 70])
     fh = random.uniform(20, 26)
     rh = random.uniform(26, 34)
@@ -432,18 +463,31 @@ for _ in range(900):
     try_place(rect, at(x, y, house(w, fh, rh, random.choice(ROOFS), random.choice(WALLS), lit,
                                    random.random() < .6, random.random() < .3)), y, 0.08)
 
-for _ in range(1600):
-    x, y = random.uniform(-10, 1010), random.uniform(10, 545)
-    r = random.uniform(9, 14)
-    kind = 'pine' if random.random() < .3 else 'round'
-    rect = box(x - r * 1.2, y - r * 3, x + r * 1.4, y + 3)
-    try_place(rect, at(x, y, tree(r, kind)), y, 0.35, avoid_start=Point(x, y).distance(Point(60, 480)) < 70)
+TREE_SIZES, BUSH_SIZES = (9, 11, 13), (6, 7.5, 9)
+SHAPES = ''.join('<g id="tree-%s-%d">%s</g>' % (k, i, tree(r, k)) for k in ('round', 'pine') for i, r in enumerate(TREE_SIZES))
+SHAPES += ''.join('<g id="bush-%d">%s</g>' % (i, bush(r)) for i, r in enumerate(BUSH_SIZES))
 
-for _ in range(500):
-    x, y = random.uniform(0, 1000), random.uniform(20, 540)
-    r = random.uniform(6, 9)
+def use(ref, x, y):
+    return '<use href="#%s" x="%s" y="%s"/>' % (ref, f(x), f(y))
+
+for _ in range(9000):
+    x, y = random.uniform(WX0 - 10, WX1 + 10), random.uniform(WY0 + 10, WY1 + 30)
+    inside = CORE.contains(Point(x, y))
+    if inside and random.random() < 0.82:
+        continue           # the town itself keeps roughly its old density; the countryside is forest
+    i = random.randrange(3)
+    r = TREE_SIZES[i]
+    kind = 'pine' if random.random() < (.3 if inside else .45) else 'round'
+    rect = box(x - r * 1.2, y - r * 3, x + r * 1.4, y + 3)
+    try_place(rect, use('tree-%s-%d' % (kind, i), x, y), y, 0.35 if inside else 0.5,
+              avoid_start=Point(x, y).distance(Point(60, 480)) < 70)
+
+for _ in range(1400):
+    x, y = random.uniform(WX0, WX1), random.uniform(WY0 + 20, WY1 + 20)
+    i = random.randrange(3)
+    r = BUSH_SIZES[i]
     rect = box(x - r, y - r * 1.6, x + r, y + 2)
-    try_place(rect, at(x, y, bush(r)), y, 0.2, avoid_start=Point(x, y).distance(Point(60, 480)) < 50)
+    try_place(rect, use('bush-%d' % i, x, y), y, 0.2, avoid_start=Point(x, y).distance(Point(60, 480)) < 50)
 
 # lamps along the street's lower edge, evenly spaced
 route_line = LineString(sample([c for s in SEGS for c in s]))
@@ -493,7 +537,7 @@ def planks():
 
 rails = road.boundary.intersection(stream.buffer(10))
 
-DEFS = '''<defs>
+DEFS_HEAD = '''<defs>
   <pattern id="grass" width="40" height="34" patternUnits="userSpaceOnUse">
     <path d="M6 10 l2 -5 l2 5 M24 26 l2 -5 l2 5 M30 8 l1.5 -4 l1.5 4 M12 28 l1.5 -4 l1.5 4" fill="none" stroke="#6f9a55" stroke-width="1.2" stroke-opacity=".55" stroke-linecap="round"/>
     <circle cx="20" cy="14" r="1.1" fill="#fff6c8" opacity=".7"/><circle cx="36" cy="22" r="1" fill="#f6b6c8" opacity=".7"/>
@@ -514,6 +558,7 @@ DEFS = '''<defs>
   <radialGradient id="lampGlow"><stop offset="0" stop-color="#ffe9a0" stop-opacity=".85"/><stop offset="1" stop-color="#ffe9a0" stop-opacity="0"/></radialGradient>
   <radialGradient id="vignette" cx=".5" cy=".5" r=".75"><stop offset=".6" stop-color="#1f2a14" stop-opacity="0"/><stop offset="1" stop-color="#1f2a14" stop-opacity=".22"/></radialGradient>
 </defs>''' % cobble_pattern()
+DEFS = DEFS_HEAD.replace('</defs>', '  <!-- trees and bushes, drawn once and reused -->\n  ' + SHAPES + '\n</defs>')
 
 def checkpoints():
     o = ['<!-- ── Stops: shops on the street\'s upper edge (the wizard stops on the road out front) ── -->',
@@ -530,8 +575,10 @@ def checkpoints():
 out = [DEFS]
 out.append('<!-- ── Scenery: a town seen from above, the street climbing bottom-left to top-right (generated by tools/gen_map.py) ── -->')
 out.append('<g class="scenery" aria-hidden="true">')
-out.append('<rect width="1000" height="530" fill="#9cc47f"/><rect width="1000" height="530" fill="url(#grass)"/>')
-for (x, y, rx, ry, c) in ((140, 90, 160, 70, '#a9cc8a'), (700, 440, 220, 80, '#93bb76'), (300, 300, 140, 50, '#a4c985'), (900, 120, 120, 60, '#94bb78')):
+out.append('<rect x="%s" y="%s" width="%s" height="%s" fill="#9cc47f"/><rect x="%s" y="%s" width="%s" height="%s" fill="url(#grass)"/>'
+           % ((WX0, WY0, WX1 - WX0, WY1 - WY0) * 2))
+for (x, y, rx, ry, c) in ((140, 90, 160, 70, '#a9cc8a'), (700, 440, 220, 80, '#93bb76'), (300, 300, 140, 50, '#a4c985'), (900, 120, 120, 60, '#94bb78'),
+                         (-250, 300, 200, 120, '#93bb76'), (1250, 600, 220, 110, '#a4c985'), (500, -180, 260, 70, '#a9cc8a'), (300, 700, 260, 70, '#93bb76')):
     out.append('<ellipse cx="%s" cy="%s" rx="%s" ry="%s" fill="%s" opacity=".6"/>' % (x, y, rx, ry, c))
 out.append(fields())
 # water: banks, then water, then sparkles
@@ -554,7 +601,6 @@ out.append(castle())
 out.append(windmill())
 for _, svg in items:
     out.append(svg)
-out.append('<rect width="1000" height="530" fill="url(#vignette)" pointer-events="none"/>')
 out.append('</g>')
 out.append('<!-- ── Path along the street (one segment per hop) ── -->')
 out.append('<g class="trail" aria-hidden="true">' + ''.join('<path id="seg-%d" d="%s"/>' % (i, seg_d(s)) for i, s in enumerate(SEGS)) + '</g>')

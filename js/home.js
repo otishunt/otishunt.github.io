@@ -79,17 +79,61 @@
     walker.setAttribute('transform', 'translate(' + p.x.toFixed(2) + ' ' + p.y.toFixed(2) + ')');
     record(p);
     renderPets();
-    follow(p);
+    aim(p);
   }
 
-  // On narrow screens the map scrolls sideways; keep the walker in view.
+  // ── Camera: the town fills the window ──────────────────────────
+  // The SVG draws a world bigger than the town (countryside all round) so it can fill any screen shape.
+  // WORLD must match the viewBox in home.html and WX0..WY1 in tools/gen_map.py.
+  var WORLD = { x: -300, y: -200, w: 1600, h: 930 };
+  var TOWN = { w: 1000, h: 530 };
   var scroller = document.getElementById('mapScroll');
   var svg = document.getElementById('map');
-  function follow(p) {
-    if (scroller.scrollWidth <= scroller.clientWidth) return;
-    var px = p.x * (svg.clientWidth / 1000);
-    scroller.scrollLeft = px - scroller.clientWidth / 2;
+  var cam = { s: 1, padTop: 0, padBottom: 0 };
+  var lastSpot = null;
+
+  function clamp(v, lo, hi) { return Math.max(lo, Math.min(hi, v)); }
+
+  // Size the map so the whole town fits between the floating tags at the top and bottom. On small
+  // screens that would make everything tiny, so keep it readable and let the camera follow the wizard.
+  function layout() {
+    var vw = scroller.clientWidth, vh = scroller.clientHeight;
+    if (!vw || !vh) return;
+    var sr = scroller.getBoundingClientRect();
+    var top = sr.top, bottom = sr.bottom;
+    ['.title', '.magick-row'].forEach(function (sel) { top = Math.max(top, world.querySelector(sel).getBoundingClientRect().bottom); });
+    ['figcaption', '.controls'].forEach(function (sel) { bottom = Math.min(bottom, world.querySelector(sel).getBoundingClientRect().top); });
+    cam.padTop = top - sr.top + 8;
+    cam.padBottom = sr.bottom - bottom + 8;
+    var availH = Math.max(120, vh - cam.padTop - cam.padBottom);
+    var fit = Math.min(vw / TOWN.w, availH / TOWN.h);
+    cam.s = Math.max(fit, Math.min(availH / TOWN.h, 1), 0.55);
+    svg.style.width = (WORLD.w * cam.s) + 'px';
+    svg.style.height = (WORLD.h * cam.s) + 'px';
+    if (lastSpot) aim(lastSpot);
   }
+
+  // Point the camera: centre the town if it fits, otherwise keep the wizard in view.
+  function aim(p) {
+    lastSpot = p;
+    var vw = scroller.clientWidth, vh = scroller.clientHeight;
+    if (!vw || !vh) return;
+    var s = cam.s;
+    var bandH = Math.max(120, vh - cam.padTop - cam.padBottom);
+    var viewW = vw / s, viewH = bandH / s;
+    var cx = viewW >= TOWN.w ? TOWN.w / 2 : clamp(p.x, viewW / 2, TOWN.w - viewW / 2);
+    var cy = viewH >= TOWN.h ? TOWN.h / 2 : clamp(p.y - 20, viewH / 2, TOWN.h - viewH / 2);
+    var tx = vw / 2 - (cx - WORLD.x) * s;
+    var ty = cam.padTop + bandH / 2 - (cy - WORLD.y) * s;
+    svg.style.transform = 'translate(' + tx.toFixed(1) + 'px, ' + ty.toFixed(1) + 'px)';
+  }
+
+  window.addEventListener('resize', function () {
+    if (!root.classList.contains('arriving')) layout();
+  });
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () {
+    if (!root.classList.contains('arriving')) layout();
+  });
 
   function face_(dir) {
     face.setAttribute('transform', dir < 0 ? 'scale(-1 1)' : '');
@@ -408,6 +452,7 @@
     if (idx === -1) {
       pages.forEach(function (p) { p.hidden = true; });
       world.hidden = false;
+      layout();
       resetMap();
       updateStatus();
       if (lastShop !== null) {
@@ -856,7 +901,7 @@
       if (h) h.setAttribute('tabindex', '-1');
       page.appendChild(copy);
       if (!reduceMotion) copy.classList.add('unrolling');
-      inkIn(copy, 0.7);
+      inkIn(copy, 0.3);
       if (i === 0) {
         (h || copy).focus({ preventScroll: true });
         copy.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'start' });
@@ -897,7 +942,7 @@
       void scroll.offsetWidth;
       scroll.classList.add('unrolling');
     }
-    inkIn(scroll, 0.7);
+    inkIn(scroll, 0.3);
     var next = page.querySelector('.buy:not([hidden])');
     (next || scroll.querySelector('h2')).focus({ preventScroll: true });
     scroll.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'start' });
@@ -937,14 +982,14 @@
 
   // Write a scroll's text in, one piece after another, like fresh ink.
   function inkIn(scroll, startDelay) {
-    startDelay = startDelay || 0.25;
+    startDelay = startDelay || 0.1;
     if (reduceMotion) return;
     var pieces = scroll.querySelectorAll('h2, h3, p, li, .portrait');
     scroll.classList.remove('inking');
     void scroll.offsetWidth; // restart the animation each time
     Array.prototype.forEach.call(pieces, function (el, i) {
       el.classList.add('ink');
-      el.style.animationDelay = (startDelay + i * 0.4) + 's';
+      el.style.animationDelay = (startDelay + i * 0.12) + 's';
     });
     scroll.classList.add('inking');
   }
@@ -1068,7 +1113,7 @@
       world.style.transform = '';
       world.style.transformOrigin = '';
       root.style.background = '';
-      root.classList.remove('arriving', 'zoom-set'); // title, key and controls fade in
+      root.classList.remove('arriving', 'zoom-set'); // title, Magick button and controls fade in
       arriving = false;
       setIdle(true);
     }

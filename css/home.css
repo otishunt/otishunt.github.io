@@ -29,122 +29,135 @@ a {
   color: inherit;
 }
 
-/* ── Map screen ─────────────────────────────────────────────── */
+/* ── Map screen: the town fills the whole window ──────────────
+   home.js sizes the map and slides it (the "camera") so the town always fits, or follows the wizard on
+   small screens. The title, Magick button, status line and controls float on top as parchment tags. */
 .world {
+  position: relative;
+  height: 100vh;
+  height: 100svh;
+  overflow: hidden;
   font-family: "Lower Pixel", "Latin Modern", "Times New Roman", serif;
-  max-width: 1100px;
-  margin: 0 auto;
-  padding: 40px 16px 32px;
+  background: #9cc47f; /* the meadow, in case the map is still loading */
+}
+
+.map-figure,
+.map-scroll {
+  position: absolute;
+  inset: 0;
+  margin: 0;
   overflow: hidden;
 }
 
-/* Key (top left) */
-.key {
+/* a soft darkening at the edges of the screen */
+.map-scroll::after {
+  content: "";
   position: absolute;
-  top: 24px;
-  left: 24px;
-  display: flex;
-  align-items: flex-end;
-  gap: 14px;
-  z-index: 1;
-  transition: opacity 0.4s ease;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(ellipse at center, transparent 55%, rgba(31, 42, 20, 0.28) 100%);
 }
 
-.arrows {
-  display: grid;
-  grid-template-columns: repeat(3, 24px);
-  grid-template-rows: 24px 24px;
-  gap: 3px;
+.map-wrap {
+  position: absolute;
+  inset: 0;
 }
 
-.arrows .up    { grid-column: 2; grid-row: 1; }
-.arrows .left  { grid-column: 1; grid-row: 2; }
-.arrows .down  { grid-column: 2; grid-row: 2; }
-.arrows .right { grid-column: 3; grid-row: 2; }
-
-kbd {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 24px;
-  height: 24px;
-  border: 1.2px solid #000;
-  border-radius: 3px;
-  box-shadow: 0 2px 0 #000;
-  font-family: inherit;
-  font-size: 14px;
-  line-height: 1;
+.map {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: block;
+  transform-origin: 0 0;
 }
 
-kbd.space {
-  width: 120px;
-}
-
-.world.leaving .key {
-  opacity: 0;
-}
-
-/* Narrow screens: put the key above the title so they don't overlap */
-@media (max-width: 760px) {
-  .key {
-    position: static;
-    margin-bottom: 16px;
-  }
-}
-
-/* Touch-only devices have no arrow keys; they use the buttons under the map */
-@media (hover: none) and (pointer: coarse) {
-  .key {
-    display: none;
-  }
+/* Floating tags over the town */
+.title,
+.magick-row,
+figcaption,
+.controls {
+  position: absolute;
+  z-index: 2;
+  left: 50%;
+  transform: translateX(-50%);
 }
 
 .title {
-  text-align: center;
-  margin-bottom: 16px;
+  top: 14px;
+  margin: 0;
 }
 
 .title h1 {
   margin: 0;
-  font-size: clamp(2rem, 6vw, 2.8rem);
+  padding: 4px 20px 6px;
+  font-size: clamp(1.6rem, 4vw, 2.4rem);
   font-weight: 400;
   line-height: 1.1;
+  white-space: nowrap;
+  background: #fffaf0;
+  border: 1.5px solid #3b2c22;
+  border-radius: 6px;
+  box-shadow: 3px 3px 0 #3b2c22;
 }
 
-.map-figure {
+/* "Magick all scrolls" sits top-left on wide screens, under the title on narrower ones */
+.magick-row {
+  top: 18px;
+  left: 18px;
+  transform: none;
   margin: 0;
+  white-space: nowrap;
 }
 
-.map-scroll {
-  overflow-x: auto;
-  overflow-y: hidden;
-  scrollbar-width: none;
-}
-
-.map-scroll::-webkit-scrollbar {
-  display: none;
-}
-
-.world.leaving .map-scroll {
-  overflow: hidden;
-}
-
-.map-wrap {
-  transform-origin: 0 0;
-}
-
-/* On narrow screens keep the map readable and let it scroll with the walker */
-@media (max-width: 720px) {
-  .map-wrap {
-    width: 760px;
+@media (max-width: 1100px) {
+  .magick-row {
+    top: 76px;
+    left: 50%;
+    transform: translateX(-50%);
   }
 }
 
-.map {
-  display: block;
-  width: 100%;
-  height: auto;
-  overflow: visible;
+figcaption {
+  bottom: 74px;
+  max-width: calc(100% - 32px);
+  padding: 6px 14px;
+  text-align: center;
+  background: rgba(255, 250, 240, 0.94);
+  border: 1.5px solid #3b2c22;
+  border-radius: 6px;
+}
+
+.controls {
+  bottom: 16px;
+  display: flex;
+  gap: 10px;
+}
+
+/* Phones on their side: little height, so shrink the tags and tuck the Magick button into a corner */
+@media (max-height: 500px) {
+  .title {
+    top: 8px;
+  }
+  .title h1 {
+    font-size: 1.3rem;
+  }
+  .magick-row {
+    top: 10px;
+    left: 10px;
+    transform: none;
+  }
+  .magick {
+    min-height: 34px;
+    font-size: 12px;
+  }
+  figcaption {
+    bottom: 62px;
+    font-size: 13px;
+    padding: 3px 10px;
+  }
+  .controls {
+    bottom: 10px;
+  }
 }
 
 .map text {
@@ -163,6 +176,21 @@ kbd.space {
 
 .checkpoint {
   cursor: pointer;
+}
+
+/* The alligator in the moat swims to one end, turns round, and swims back */
+.gator {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: gator 16s ease-in-out infinite;
+}
+
+@keyframes gator {
+  0%, 4%    { transform: translateX(0) scaleX(1); }
+  44%       { transform: translateX(46px) scaleX(1); }
+  50%, 54%  { transform: translateX(46px) scaleX(-1); }
+  94%       { transform: translateX(0) scaleX(-1); }
+  100%      { transform: translateX(0) scaleX(1); }
 }
 
 /* The windmill's sails turn slowly */
@@ -309,7 +337,6 @@ html.arriving.zoom-set .world {
   visibility: visible;
 }
 
-html.arriving .key,
 html.arriving .title,
 html.arriving figcaption,
 html.arriving .controls,
@@ -326,11 +353,6 @@ figcaption,
 }
 
 /* "Magick all scrolls" for visitors who'd rather skip the game */
-.magick-row {
-  margin: 14px 0 0;
-  text-align: center;
-}
-
 .magick {
   min-height: 40px;
   padding: 0 16px;
@@ -414,33 +436,21 @@ figcaption,
   opacity: 0;
 }
 
-/* Caption + controls */
-figcaption {
-  margin-top: 12px;
-  text-align: center;
-  min-height: 1.5em;
-}
-
-.controls {
-  display: flex;
-  justify-content: center;
-  gap: 10px;
-  margin-top: 14px;
-}
-
+/* Controls */
 .controls button {
   min-width: 48px;
   min-height: 44px;
   padding: 0 16px;
-  background: #fff;
-  border: 1.5px solid #000;
-  border-radius: 0;
+  background: #fffaf0;
+  border: 1.5px solid #3b2c22;
+  border-radius: 6px;
+  box-shadow: 3px 3px 0 #3b2c22;
   cursor: pointer;
 }
 
 .controls button:hover {
-  background: #000;
-  color: #fff;
+  background: #3b2c22;
+  color: #fffaf0;
 }
 
 .controls button:focus-visible,
@@ -740,7 +750,7 @@ body:has(> .page:not([hidden])) {
 }
 
 .scroll.unrolling {
-  animation: unroll 0.8s ease-out both;
+  animation: unroll 0.35s ease-out both;
 }
 
 @keyframes unroll {
@@ -939,7 +949,7 @@ body:has(> .page:not([hidden])) {
 
 /* Ink appearing as if a wizard is writing it, one line of the scroll at a time */
 .inking .ink {
-  animation: ink 1s ease-out both;
+  animation: ink 0.45s ease-out both;
 }
 
 @keyframes ink {
@@ -994,6 +1004,7 @@ body:has(> .page:not([hidden])) {
   }
   .walker.idle .walker-body,
   .sails,
+  .gator,
   .magick.cast,
   .pet-pop,
   .resident,
